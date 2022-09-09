@@ -6,13 +6,6 @@
 #include <ctype.h>
 #include <sys/wait.h>
 
-#define typeof(var) _Generic( (var),\
-char: "Char",\
-int: "Integer",\
-float: "Float",\
-char *: "String",\
-void *: "Pointer",\
-default: "Undefined")
 
 #define MAX_LINE 80 /* 80 chars per line, per command */
 
@@ -21,7 +14,7 @@ char cmd[MAX_LINE]; //user Inputs
 char *texto;
 char style[4]="seq";
 int cmd_count;
-
+char *lastCmd[MAX_LINE];
 char *cmd_clean[MAX_LINE];
 
 void execCmd(char *args, char *argv){
@@ -96,6 +89,9 @@ int main(int argc, char* argv[])
 
         char **cmdsArray = splitString(cmd, &cmd_count);
 
+        for (int i = 0; i < cmd_count; ++i) {
+            printf("--%s\n",cmdsArray[i]);
+        }
 
         //printar os comandos!
         for (int i = 0; i < cmd_count ; i++) {
@@ -105,6 +101,9 @@ int main(int argc, char* argv[])
                 printf("== Shell encerrado! ==\n");
                 should_run++;//condicao de saida
                 break;
+            }//verificar !!:
+            else if (strcmp(cmd, "!!") == 0){
+                printf("Ultimo comando: %s\n", *lastCmd); //salvar numa variavel global o ultimo comando!!
             }
 
             //verificar mudança de estilo!
@@ -114,9 +113,13 @@ int main(int argc, char* argv[])
             //printf("%s\n",cmdsArray[i]);
             int cmdsArrayElem_count;
             char **cmdsArrayElem = splitStringSpace(cmdsArray[i], &cmdsArrayElem_count);
-            for (int i=0; i < cmdsArrayElem_count; i++) {
-               // printf("ELem: %s\n", cmdsArrayElem[i]);
+            for (int j=0; j < cmdsArrayElem_count; j++) {
+               // printf("ELem: %s\n", cmdsArrayElem[j]);
             }
+
+            lastCmd[0]=cmdsArrayElem[i];
+            printf("%s\n",*lastCmd);
+
 //fazendo o fork pro processo atual nao ser encerrado
     //Melhorar isso!! Só ta funfando com o primeiro cmd, tentar um for!!
     //Nao funfou!! melhorar aqui!
@@ -129,6 +132,7 @@ int main(int argc, char* argv[])
                     pid = getpid();
                     execvp(cmdsArrayElem[i], cmdsArrayElem);
                 }else{ /* parent process */
+
                     wait(NULL);
                 }
             }
