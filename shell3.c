@@ -69,14 +69,13 @@ int *styleCheck(char *input){ //tbm cmd vazio!!
         strcpy(style, "seq");
         styleErr=0;
     }else if(isspace(*input)==0) {
-       // printf(" len %ld\n", strlen(cmd));
-        for (int i = 0; i < strlen(cmd); ++i) {
-            if (isspace(cmd[i]) == 0) {
+// printf(" len %ld\n", strlen(cmd));
+        for (int i = 0; i < strlen(input); ++i) {
+            if (isspace(input[i]) == 0) {
                 count++;
             }
         }
-        //printf("count %d\n",count);
-        if(count== strlen(cmd)){
+        if(count== strlen(input)&&strcmp(input,"!!")){
             fprintf(stderr,"No commands\n");
         }
     }
@@ -188,13 +187,11 @@ int main(int argc, char* argv[]) {
                        }
 
                    }//fim Sequencial!!
-
+                  //inicio Paralelo
                    if (strcmp(style, "par") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0) {
                        //printf("AGORA PARALLELO: %s\n",argv[0]);
                        //forkar para que o execvp nao encerre o processo atual:
-                       if (argv[0] == NULL) {
-                           fprintf(stderr, "No commands\n");
-                       }
+
                        pid_t pid;
                        /* fork a child process */
                        pid = fork();

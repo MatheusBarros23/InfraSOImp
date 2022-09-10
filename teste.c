@@ -34,6 +34,7 @@ int main() {
     int should_run = 1;        /* flag to help exit program*/
     char lastCmd[MAX_LINE];
     should_run=1;
+    int result=0;
     while (should_run){
     printf("mprb %s> ", style);
     fflush(stdout);
@@ -44,17 +45,16 @@ int main() {
     cmd[strlen(cmd) - 1] = 0;
     fflush(stdout);
 
-    printf("%s\n",cmd);
-
+        result = isspace(cmd);
+        printf("%s",cmd);
+        if (result == 0)
+        {
+            printf("Not a white-space character.");
+        }
+        else
+        {
+            printf("White-space character.");
+        }
     }
     return 0;
-}
-
-for (int i = 0; i < strlen(cmd); ++i) {
-if(isspace(*input)==0){
-count++;
-}
-}
-if(count== strlen(cmd)){
-fprintf(stderr,"No commands\n");
 }
