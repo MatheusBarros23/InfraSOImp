@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 
 #define MAX_LINE 80 /* 80 chars per line, per command */
@@ -24,6 +25,7 @@ char *lastCmd[MAX_LINE]={};
 int histVerify=0;
 int exitCheck =0;
 int should_run = 1;        /* flag to help exit program*/
+
 
 //splitar a string!! Tentar ver por strtok
 char **splitString(char *string, int *cmdCount) {
@@ -83,9 +85,9 @@ int *styleCheck(char *input){ //tbm cmd vazio!!
     }
 }
 
-
 int execvpSeq(char *cmds[]){
     pid_t pid;
+    int pid1;
     /* fork a child process */
     pid = fork();
     if(pid < 0){ /* error occured */
@@ -94,10 +96,13 @@ int execvpSeq(char *cmds[]){
     }
     else if(pid == 0){ /* child process */
         pid = getpid();
-        if(execvp(cmds[0], cmds)<0){
+        if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")){
             fprintf(stderr,"Execvp failed: %s not a Command\n",cmds[0]);
+            kill(pid1,SIGKILL);
+            execWorked=0;
+        }else{
+            return 0;
         }
-        execWorked=1;
     }else{ /* parent process */
 
         wait(NULL);
@@ -111,7 +116,7 @@ int execvpPar(char *argv[]){
 
 
 int main(int argc, char* argv[]) {
-
+    int retorno=0;
 
     while (should_run < 2) {
         printf("mprb %s> ", style);
@@ -122,6 +127,8 @@ int main(int argc, char* argv[]) {
         fgets(cmd, MAX_LINE, stdin);
         cmd[strlen(cmd) - 1] = 0;
         fflush(stdout);
+
+        printf("CMD: %s\n",cmd);
 
         //verificar Exit:
         if (strcmp(cmd, "exit") == 0) {
@@ -136,8 +143,12 @@ int main(int argc, char* argv[]) {
             //verificar !! :                //FAZER O HISTORICO!!
         else if (strcmp(cmd, "!!") == 0){
             if(strcmp(argv[0], "!!") != 0){
-                fprintf(stdout, "%s\n",argv[0]);
-                execvpSeq(argv);
+                //fprintf(stdout, "%s\n",argv[0]);
+                retorno = execvpSeq(argv);                        //sequencial
+                if(retorno>0){
+                }else{
+                   fprintf(stdout, "No commands\n");
+                }
             }
         }
 
@@ -146,6 +157,11 @@ int main(int argc, char* argv[]) {
 
         //Splittar os Comandos pela ;
         char **cmdsArray = splitString(cmd, &cmd_count);
+
+        for (int i = 0; i <= cmd_total; ++i) {
+            printf("CMDSARRAY: %s\n",cmdsArray[i]);
+        }
+
 
 
 //Executar os comandos!!
@@ -170,52 +186,33 @@ int main(int argc, char* argv[]) {
                    //printf("last: %s\n",lastCmd);
                    if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0 && exitCheck==0) {
                        //forkar para que o execvp nao encerre o processo atual:
-                       pid_t pid;
-                       /* fork a child process */
-                       pid = fork();
-                       if (pid < 0) { /* error occured */
-                           fprintf(stderr, "Comando falhou! Fork failed!");
-                           return 1;
-                       } else if (pid == 0) { /* child process */
-                           pid = getpid();
-                           if (cmdsArray[i] == NULL) {
-
-                           } else if (execvp(argv[0], argv) < 0 && strcmp(argv[0], "!!")) {
-                               fprintf(stderr, "Execvp failed: %s not a Command\n", argv[0]);
-                               execWorked=0;
-                           }else{
-                               execWorked=1;
-                           }
-                       } else { /* parent process */
-                           printf("exit on: %d\n",should_run);
-                           wait(NULL);
-                       }
-
+                       execvpSeq(argv);
                    }//fim Sequencial!!
 
-
                   //inicio Paralelo
-                   if (strcmp(style, "par") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0) {
+                   if (strcmp(style, "par") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0&& exitCheck==0) {
                        //printf("AGORA PARALLELO: %s\n",argv[0]);
 
                        for (int l = 0; l < cmd_count; ++l) {
                            printf("paralelo - cmdsArray - %s\n", cmdsArray[l]);
                        }
+                       printf("paralelo - cmd_count - %d\n", cmd_count);
 
                        //forkar para que o execvp nao encerre o processo atual:
                        pid_t pid;
+                       int pid1;
                        /* fork a child process */
                        pid = fork();
+
                        if (pid < 0) { /* error occured */
                            fprintf(stderr, "Comando falhou! Fork failed!");
                            return 1;
                        } else if (pid == 0) { /* child process */
                            pid = getpid();
-
                            if (cmdsArray[i] == NULL) {
-
                            } else if (execvp(argv[0], argv) < 0 && strcmp(argv[0], "!!")) {
                                fprintf(stderr, "Execvp failed: %s not a Command\n", argv[0]);
+                               kill(pid1,SIGKILL);
                            }
                        } else { /* parent process */
 
