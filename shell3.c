@@ -102,6 +102,7 @@ int execvpSeq(char *cmds[]){
 }
 
 int execvpPar(char *argv[]){
+
     //fazerParalelo
 }
 
