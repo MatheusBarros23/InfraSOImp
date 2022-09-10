@@ -45,6 +45,16 @@ int main() {
     fflush(stdout);
 
     printf("%s\n",cmd);
+
     }
     return 0;
+}
+
+for (int i = 0; i < strlen(cmd); ++i) {
+if(isspace(*input)==0){
+count++;
+}
+}
+if(count== strlen(cmd)){
+fprintf(stderr,"No commands\n");
 }
