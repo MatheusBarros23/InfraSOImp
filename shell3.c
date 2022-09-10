@@ -22,6 +22,8 @@ int execWorked=0;
 int batchCheck=0;
 char *lastCmd[MAX_LINE]={};
 int histVerify=0;
+int exitCheck =0;
+int should_run = 1;        /* flag to help exit program*/
 
 //splitar a string!! Tentar ver por strtok
 char **splitString(char *string, int *cmdCount) {
@@ -75,8 +77,8 @@ int *styleCheck(char *input){ //tbm cmd vazio!!
                 count++;
             }
         }
-        if(count== strlen(input)&&strcmp(input,"!!")){
-            fprintf(stderr,"No commands\n");
+        if(count== strlen(input) && strcmp(input,"!!")&&execWorked==0){
+            //fprintf(stderr,"No commands\n");
         }
     }
 }
@@ -97,6 +99,7 @@ int execvpSeq(char *cmds[]){
         }
         execWorked=1;
     }else{ /* parent process */
+
         wait(NULL);
     }
 }
@@ -108,8 +111,6 @@ int execvpPar(char *argv[]){
 
 
 int main(int argc, char* argv[]) {
-    int should_run = 1;        /* flag to help exit program*/
-
 
 
     while (should_run < 2) {
@@ -125,7 +126,9 @@ int main(int argc, char* argv[]) {
         //verificar Exit:
         if (strcmp(cmd, "exit") == 0) {
             printf("== Shell encerrado! ==\n");
+            exitCheck=1;
             should_run=3;//condicao de saida
+
             break;
         }
 
@@ -143,8 +146,6 @@ int main(int argc, char* argv[]) {
 
         //Splittar os Comandos pela ;
         char **cmdsArray = splitString(cmd, &cmd_count);
-
-
 
 
 //Executar os comandos!!
@@ -167,7 +168,7 @@ int main(int argc, char* argv[]) {
 
                    //sequencial!!
                    //printf("last: %s\n",lastCmd);
-                   if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0) {
+                   if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0 && exitCheck==0) {
                        //forkar para que o execvp nao encerre o processo atual:
                        pid_t pid;
                        /* fork a child process */
@@ -181,18 +182,27 @@ int main(int argc, char* argv[]) {
 
                            } else if (execvp(argv[0], argv) < 0 && strcmp(argv[0], "!!")) {
                                fprintf(stderr, "Execvp failed: %s not a Command\n", argv[0]);
+                               execWorked=0;
+                           }else{
+                               execWorked=1;
                            }
-                           execWorked = 1;
                        } else { /* parent process */
+                           printf("exit on: %d\n",should_run);
                            wait(NULL);
                        }
 
                    }//fim Sequencial!!
+
+
                   //inicio Paralelo
                    if (strcmp(style, "par") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0) {
                        //printf("AGORA PARALLELO: %s\n",argv[0]);
-                       //forkar para que o execvp nao encerre o processo atual:
 
+                       for (int l = 0; l < cmd_count; ++l) {
+                           printf("paralelo - cmdsArray - %s\n", cmdsArray[l]);
+                       }
+
+                       //forkar para que o execvp nao encerre o processo atual:
                        pid_t pid;
                        /* fork a child process */
                        pid = fork();
@@ -208,11 +218,11 @@ int main(int argc, char* argv[]) {
                                fprintf(stderr, "Execvp failed: %s not a Command\n", argv[0]);
                            }
                        } else { /* parent process */
+
                            wait(NULL);
                        }
                    }
                }
-
            }
        }
         //printf("ultimo %s   \n",lastCmd[1]);
