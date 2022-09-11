@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <sys/wait.h>
 #include <signal.h>
-
+#include <pthread.h>
 
 #define MAX_LINE 80 /* 80 chars per line, per command */
 
@@ -25,6 +25,15 @@ char *lastCmd[MAX_LINE]={};
 int histVerify=0;
 int exitCheck =0;
 int should_run = 1;        /* flag to help exit program*/
+
+
+//PASSAR OS DADOS DO PARALELO POR ESTRUTURA!!!
+
+typedef struct
+{
+    int size;
+    char* cmds[MAX_LINE/2+1];
+}Argv_ParStruct;
 
 
 //splitar a string!! Tentar ver por strtok
@@ -95,23 +104,22 @@ int execvpSeq(char *cmds[]){
         return 1;
     }
     else if(pid == 0){ /* child process */
-        pid = getpid();
+        pid1 = getpid();
         if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")){
             fprintf(stderr,"Execvp failed: %s not a Command\n",cmds[0]);
-            kill(pid1,SIGKILL);
+            kill(pid1,9);
             execWorked=0;
         }else{
             return 0;
         }
     }else{ /* parent process */
-
         wait(NULL);
     }
 }
 
-int execvpPar(char *argv[]){
+int execvpPar(Argv_ParStruct *Argv_par){
+    
 
-    //fazerParalelo
 }
 
 
@@ -159,14 +167,14 @@ int main(int argc, char* argv[]) {
         char **cmdsArray = splitString(cmd, &cmd_count);
 
         for (int i = 0; i <= cmd_total; ++i) {
-            printf("CMDSARRAY: %s\n",cmdsArray[i]);
+           // printf("CMDSARRAY: %s\n",cmdsArray[i]);
         }
 
 
 
 //Executar os comandos!!
         //printf("CMDTOTAL: %d\n",cmd_total);
-       if(histVerify==0) {
+       if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!")) {
            for (int i = 0; i <= cmd_total; ++i) {
                //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
                for (int j = 0; j <= cmd_args_count; ++j) {
@@ -180,52 +188,66 @@ int main(int argc, char* argv[]) {
                        k++;
                    }
                    argv[k] = NULL; //ultima para NULL, necessidade do execvp
-                   k=0;
+                   k = 0;
 
                    //sequencial!!
                    //printf("last: %s\n",lastCmd);
-                   if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0 && exitCheck==0) {
+                   if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0 &&
+                       exitCheck == 0) {
                        //forkar para que o execvp nao encerre o processo atual:
                        execvpSeq(argv);
                    }//fim Sequencial!!
-
-                  //inicio Paralelo
-                   if (strcmp(style, "par") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0&& exitCheck==0) {
-                       //printf("AGORA PARALLELO: %s\n",argv[0]);
-
-                       for (int l = 0; l < cmd_count; ++l) {
-                           printf("paralelo - cmdsArray - %s\n", cmdsArray[l]);
-                       }
-                       printf("paralelo - cmd_count - %d\n", cmd_count);
-
-                       //forkar para que o execvp nao encerre o processo atual:
-                       pid_t pid;
-                       int pid1;
-                       /* fork a child process */
-                       pid = fork();
-
-                       if (pid < 0) { /* error occured */
-                           fprintf(stderr, "Comando falhou! Fork failed!");
-                           return 1;
-                       } else if (pid == 0) { /* child process */
-                           pid = getpid();
-                           if (cmdsArray[i] == NULL) {
-                           } else if (execvp(argv[0], argv) < 0 && strcmp(argv[0], "!!")) {
-                               fprintf(stderr, "Execvp failed: %s not a Command\n", argv[0]);
-                               kill(pid1,SIGKILL);
-                           }
-                       } else { /* parent process */
-
-                           wait(NULL);
-                       }
-                   }
                }
-           }
+           }//fim do for sequencial!!
+           cmd_args_count=0;
+           cmd_total=0;
+           histVerify=0;
        }
+
+           //inicio Paralelo
+            else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
+               printf("AGORA PARALLELO: %s\n",argv[0]);
+
+               //inicializando a struct para armazenar os dados! Conforme o tamanho
+               Argv_ParStruct argvPar = {cmd_total};
+
+               for (int l = 0; l < cmd_count; ++l) {
+                   argvPar.cmds[l] = cmdsArray[l];
+               }
+
+               //for para analisar o struct criado!!
+               for (int l = 0; l < cmd_count; ++l) {
+                   printf("paralelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
+               }
+                printf("paralelo -  argvPar->size- %d\n", argvPar.size);
+       //execução dos COMANDOS!! (Max. 2);
+                pthread_t thread1, thread2;
+                int  t1, t2;
+
+                //testando criacao das threads!!
+                t1 = pthread_create(&thread1, NULL, (void *) execvpPar, (void *) &argvPar);
+                t2 = pthread_create(&thread2, NULL, (void *) execvpPar, (void *) &argvPar);
+                if(t1)
+                {
+                    fprintf(stderr,"Error - pthread_create() return code: %d\n", t1);
+                    exit(EXIT_FAILURE);
+                }
+                if(t2)
+                {
+                    fprintf(stderr,"Error - pthread_create() return code: %d\n",t2);
+                    exit(EXIT_FAILURE);
+                }
+
+                printf("pthread_create() for Thread 1 returns: %d\n",t1);
+                printf("pthread_create() for Thread 2 returns: %d\n",t2);
+           /* Wait till threads are complete before main continues. */
+                pthread_join(thread1, NULL);
+                pthread_join(thread2, NULL);
+            }
+
+
         //printf("ultimo %s   \n",lastCmd[1]);
-        cmd_args_count=0;
-        cmd_total=0;
-        histVerify=0;
+
     }
     return 0;
 }
