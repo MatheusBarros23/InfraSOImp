@@ -124,7 +124,7 @@ int execvpSeq(char *cmds[]){
 
         Acessam o mesmo espaço de memória. Que está sendo modificado.
 */
-char *execvpParSep(Argv_ParStruct *Argv_par){
+char *execvpPar(Argv_ParStruct *Argv_par){
     // splitar cada Argv_par->cmds[execvpPar_count] em um cmd e args e chamar a execução!!
     char *txt;
     txt = strtok(Argv_par->cmds[execvpPar_count], " ");
@@ -139,7 +139,7 @@ char *execvpParSep(Argv_ParStruct *Argv_par){
     }
     argv_p[k] = NULL; //ultima para NULL, necessidade do execvp
     //return argv_p;
-    //execvpSeq(argv_p);
+    execvpSeq(argv_p);
     execvpPar_count++;
 }
 
@@ -245,13 +245,13 @@ int main(int argc, char* argv[]) {
 
                 //separar aqui e depois passar tudo certinho para as thread!! já dividido!!
 
-                char *cmdArgvPar = execvpParSep(&argvPar);
+               // char *cmdArgvPar = execvpParSep(&argvPar);
                 //printf("cmdArgvPar: %s\n",argvPar);
 
             //testando criacao das threads!!
                 for (int i = 0; i < cmd_count; ++i) {
                     printf("cmd_count: %d\n",cmd_count);
-                    t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpParSep, (void *) &argvPar);
+                    t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar);
                     if(t1[i])
                     {
                         fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);

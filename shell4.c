@@ -246,7 +246,7 @@ int main(int argc, char* argv[]) {
             //testando criacao das threads!!
             for (int i = 0; i < cmd_count; ++i) {
                 printf("cmd_count: %d\n",cmd_count);
-                t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpSeq, (void *) &argvPar);
+                t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpParSep, (void *) &argvPar);
                 if(t1[i])
                 {
                     fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
