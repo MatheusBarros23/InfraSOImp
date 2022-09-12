@@ -87,14 +87,14 @@ int *styleCheck(char *input){ //tbm cmd vazio!!
         styleErr=0;
     }else if(isspace(*input)==0) {
 // printf(" len %ld\n", strlen(cmd));
-        for (int i = 0; i < strlen(input); ++i) {
+        for (int i = 0; i < strlen(input); ++i) { //arrumar aqui! bug no !!
             if (isspace(input[i]) == 0) {
                 count++;
             }
         }
-        if(count== strlen(input) && strcmp(input,"!!")&&execWorked==0){
-            //fprintf(stderr,"No commands\n");
-        }
+        //if(count== strlen(input) && strcmp(input,"!!")&&execWorked==0){
+         //   fprintf(stderr,"No commands\n");
+       // }
     }
 }
 
@@ -109,7 +109,7 @@ int execvpSeq(char *cmds[]){
     }
     else if(pid == 0){ /* child process */
         pid1 = getpid();
-        if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")){
+        if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")!=0&& strcmp(cmds[0], "style")!=0){
             fprintf(stderr,"Execvp failed: %s not a Command\n",cmds[0]);
             kill(pid1,9);
             execWorked=0;
@@ -152,6 +152,7 @@ int main(int argc, char* argv[]) {
     int retorno=0;
 
     while (should_run < 2) {
+        while (argc==1){
         printf("mprb %s> ", style);
         fflush(stdout);
 
@@ -177,7 +178,11 @@ int main(int argc, char* argv[]) {
         else if (strcmp(cmd, "!!") == 0){
             if(strcmp(argv[0], "!!") != 0){
                 //fprintf(stdout, "%s\n",argv[0]);
-                retorno = execvpSeq(argv);                        //sequencial
+                if(strcmp(style,"seq")==0){
+                    retorno = execvpSeq(argv);
+                }else if(strcmp(style,"par")==0){
+                    retorno = execvpSeq(argv); //arrumar isso!! para aceitar tbm argv no execvpPar
+                }
                 if(retorno>0){
                 }else{
                    fprintf(stdout, "No commands\n");
@@ -254,14 +259,14 @@ int main(int argc, char* argv[]) {
 
             //testando criacao das threads!!
                 for (int i = 0; i < cmd_count; ++i) {
-                    printf("cmd_count: %d\n",cmd_count);
+                   // printf("cmd_count: %d\n",cmd_count);
                     t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
                     if(t1[i])
                     {
                         fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
                         exit(EXIT_FAILURE);//eroor
                     }
-                    printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
+                   // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
                 }
 
            /* Wait till threads are complete before main continues. */
@@ -270,22 +275,37 @@ int main(int argc, char* argv[]) {
                if(pthread_join(thread1[i], NULL)!=0){
                    return 2;
                }
-               pthread_mutex_destroy(&lock);
-               printf("Thread %d FINISHED\n",i);
+               pthread_mutex_destroy(&lock); //liberar o acesso depois das threads
+               //printf("Thread %d FINISHED\n",i);
+               if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
+                   execvpPar_count=0;
+               }
            }
-                execvpPar_count=0; //zerar para não gerar prob com outros loops
             }
 
         //printf("ultimo %s   \n",lastCmd[1]);
         cmd_total=0;
+        }
+        while (argc>1&&argc<3){
+            //peguei o tamanho!!
+            // agora pegar o nome do arq
+                //ler linha por linha
+                //condição de saida quando não consigo abrir aqr!
+                printf("PASSANDO O FILE!!\n");
+                should_run=3;
+                break;
+            }
+        if(argc>=3){
+                fprintf(stderr,"Too many arguments\n");
+                exit(0);
+        }
     }
+
     return 0;
 }
 
 
-// IMPLEMENTAR O !! novamente! Esta dando erro...
-
-//BATCH
+//BATCH - pegar o arq!
 //PIPE
 //BACKGROUND &
 
