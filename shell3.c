@@ -293,6 +293,7 @@ int main(int argc, char* argv[]) {
                 //condição de saida quando não consigo abrir aqr!
                 printf("PASSANDO O FILE!!\n");
                 should_run=3;
+                //print shell encerrado!!
                 break;
             }
         if(argc>=3){
