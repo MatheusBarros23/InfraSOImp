@@ -4,5 +4,5 @@ project(INFRASO C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(INFRASO
-        shell.c
+        shell3.c
         )

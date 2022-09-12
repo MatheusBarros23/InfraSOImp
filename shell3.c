@@ -282,10 +282,12 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-//fazer paralelo!! Aqui, forks e 2 filhos processando em simultaneo!! -------->> FOCAR NISSO!!
-        //Fazer o Batch - planejar e começar!!
 
 // IMPLEMENTAR O !! novamente! Esta dando erro...
+
+//BATCH
+//PIPE
+//BACKGROUND &
 
 /* int len = sizeof(*argv)/sizeof(argv[0]);
             for (int l = 0; l <= len ; ++l) {
