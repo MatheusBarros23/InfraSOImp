@@ -28,6 +28,8 @@ int should_run = 1;        /* flag to help exit program*/
 int execvpPar_count=0; /* flag to help count the execvpar calls*/
 char *argv_p[MAX_LINE/2+1];
 
+//lokar o contador para não dar prob quando passar as strings!!
+pthread_mutex_t lock;
 
 //PASSAR OS DADOS DO PARALELO POR ESTRUTURA!!!
 
@@ -138,9 +140,11 @@ char *execvpPar(Argv_ParStruct *Argv_par){
         k++;
     }
     argv_p[k] = NULL; //ultima para NULL, necessidade do execvp
+    pthread_mutex_lock(&lock); //começo o lock
+    execvpPar_count++; //var estava dando prob pq era incrementada pelas threads que chegava antes, entao solução foi lockar para cada 1 acessar
+    pthread_mutex_unlock(&lock);//termino o lock
     //return argv_p;
     execvpSeq(argv_p);
-    execvpPar_count++;
 }
 
 
@@ -251,7 +255,7 @@ int main(int argc, char* argv[]) {
             //testando criacao das threads!!
                 for (int i = 0; i < cmd_count; ++i) {
                     printf("cmd_count: %d\n",cmd_count);
-                    t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar);
+                    t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
                     if(t1[i])
                     {
                         fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
@@ -266,6 +270,7 @@ int main(int argc, char* argv[]) {
                if(pthread_join(thread1[i], NULL)!=0){
                    return 2;
                }
+               pthread_mutex_destroy(&lock);
                printf("Thread %d FINISHED\n",i);
            }
                 execvpPar_count=0; //zerar para não gerar prob com outros loops
