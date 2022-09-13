@@ -10,6 +10,8 @@
 
 #define MAX_LINE 80 /* 80 chars per line, per command */
 
+FILE *pnt;
+
 char *args[MAX_LINE/2+1]; //array de ponteiros de char
 char cmd[MAX_LINE]; //user Inputs
 char *texto;
@@ -74,7 +76,6 @@ char **splitStringSpace(char *string, int *cmdCount) { //posso melhorar isso ne,
     }
     return array;
 }
-
 
 
 int *styleCheck(char *input){ //tbm cmd vazio!!
@@ -286,18 +287,32 @@ int main(int argc, char* argv[]) {
         //printf("ultimo %s   \n",lastCmd[1]);
         cmd_total=0;
         }
-        while (argc>1&&argc<3){
+        while (argc>1 && argc<3){
             //peguei o tamanho!!
-            // agora pegar o nome do arq
-                //ler linha por linha
+        // agora pegar o nome do arq -- PEGUEI -- argv[1]
+            printf("NOMEEEE argv: %s\n",argv[1]);
+            pnt=fopen(argv[1],"r+");
+            char *cmdString;
+            cmdString = fgets(cmd, MAX_LINE, pnt);
+            cmdString[strlen(cmdString)-1]=0; //resolve erro do \n no final!!
+            printf("LINHA DO ARQ: %s\n",cmdString);
+            fclose(pnt);
+
+            //LIMPAR A STRING!!
+            char **cmdsArray = splitString(cmdString, &cmd_count);
+            for (int i = 0; i <= cmd_total ; ++i) {
+                printf("CMDSARRAY: %s\n",cmdsArray[i]);
+            }
+
+                //Corrigir erro quando não consegue abrir o arq!!
+            //ler linha por linha
                 //condição de saida quando não consigo abrir aqr!
-                printf("PASSANDO O FILE!!\n");
                 should_run=3;
                 //print shell encerrado!!
                 break;
             }
         if(argc>=3){
-                fprintf(stderr,"Too many arguments\n");
+                fprintf(stderr,"Too many arguments! Choose the correct file\n");
                 exit(0);
         }
     }
