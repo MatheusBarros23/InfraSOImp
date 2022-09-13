@@ -305,7 +305,87 @@ int main(int argc, char* argv[]) {
             }
 
                 //Corrigir erro quando não consegue abrir o arq!!
-            //ler linha por linha
+
+                // executar quando sequencial:
+            if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!")) {
+                for (int i = 0; i <= cmd_total; ++i) {
+                    //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
+                    for (int j = 0; j <= cmd_args_count; ++j) {
+                        char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
+                        txt = strtok(cmdsArray[i], " ");
+                        int k = 0;
+                        while (txt != NULL) {
+                            argv[k] = txt;
+                            txt = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv[k] = NULL; //ultima para NULL, necessidade do execvp
+
+                        //sequencial!!
+                        //printf("last: %s\n",lastCmd);
+                        if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0 &&
+                            exitCheck == 0) {
+                            //forkar para que o execvp nao encerre o processo atual:
+                            execvpSeq(argv);
+                        }//fim Sequencial!!
+                    }
+                }//fim do for sequencial!!
+                cmd_args_count=0;
+                cmd_total=0;
+                histVerify=0;
+            }
+            //fim sequencial
+            //executar paralelo
+            else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
+                //  printf("AGORA PARALLELO: %s\n",argv[0]);
+
+                //inicializando a struct para armazenar os dados! Conforme o tamanho
+                Argv_ParStruct argvPar = {cmd_total};
+
+                for (int l = 0; l < cmd_count; ++l) {
+                    argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
+                }
+
+                //for para analisar o struct criado!!
+                for (int l = 0; l < cmd_count; ++l) {
+                    // printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
+                }
+                //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
+                //execução dos COMANDOS!! (Max. 2);
+                pthread_t thread1[cmd_count];
+                int  t1[cmd_count];
+
+                //separar aqui e depois passar tudo certinho para as thread!! já dividido!!
+
+                // char *cmdArgvPar = execvpParSep(&argvPar);
+                //printf("cmdArgvPar: %s\n",argvPar);
+
+                //testando criacao das threads!!
+                for (int i = 0; i < cmd_count; ++i) {
+                    // printf("cmd_count: %d\n",cmd_count);
+                    t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
+                    if(t1[i])
+                    {
+                        fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
+                        exit(EXIT_FAILURE);//eroor
+                    }
+                    // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
+                }
+
+                /* Wait till threads are complete before main continues. */
+                //FOR usado para juntar todos as threads criadas, de modo a esperar o wait da main!
+                for (int i = 0; i < cmd_count; ++i) {
+                    if(pthread_join(thread1[i], NULL)!=0){
+                        return 2;
+                    }
+                    pthread_mutex_destroy(&lock); //liberar o acesso depois das threads
+                    //printf("Thread %d FINISHED\n",i);
+                    if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
+                        execvpPar_count=0;
+                    }
+                }
+            }
+            //FIM PARALLELO
                 //condição de saida quando não consigo abrir aqr!
                 should_run=3;
                 //print shell encerrado!!
@@ -330,3 +410,5 @@ int main(int argc, char* argv[]) {
                 lastCmd[l] = argv[l];
             }
             */
+
+// PRECISO COLOCAR UM CHECK DO STYLE ANTES DE CADA EXECUÃO!!

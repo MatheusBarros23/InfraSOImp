@@ -1,1 +1,1 @@
-echo 123; echo 321; /bin/ls;echo 123; echo 321; /bin/ls;echo 123
+style parallel; echo 123; echo 321; /bin/ps; echo 123; /bin/ps; echo 123; /bin/ps
