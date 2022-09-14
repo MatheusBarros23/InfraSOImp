@@ -8,7 +8,8 @@
 #include <signal.h>
 #include <pthread.h>
 
-#define MAX_LINE 80 /* 80 chars per line, per command */
+
+#define MAX_LINE 200 /* 80 chars per line, per command */
 
 FILE *pnt;
 
@@ -87,8 +88,8 @@ int *styleCheck(char *input){ //tbm cmd vazio!!
         strcpy(style, "seq");
         styleErr=0;
     }else if(isspace(*input)==0) {
-// printf(" len %ld\n", strlen(cmd));
-        for (int i = 0; i < strlen(input); ++i) { //arrumar aqui! bug no !!
+        //printf(" len %ld\n", strlen(cmd));
+        for (int i = 0; i < strlen(input); ++i) {   //ISSO EVITA BUG NO PARALELOOOOOO!!!
             if (isspace(input[i]) == 0) {
                 count++;
             }
@@ -129,23 +130,24 @@ int execvpSeq(char *cmds[]){
 */
 char *execvpPar(Argv_ParStruct *Argv_par){
     // splitar cada Argv_par->cmds[execvpPar_count] em um cmd e args e chamar a execução!!
+
     char *txt;
     txt = strtok(Argv_par->cmds[execvpPar_count], " ");
     int k = 0;
-    for (int i = 0; i < sizeof(*argv_p)/sizeof(argv_p[0]); ++i) {
-        argv_p[i]=NULL;
-    }
+
     while (txt != NULL) {
         argv_p[k] = txt;
         txt = strtok(NULL, " ");
         k++;
     }
-    argv_p[k] = NULL; //ultima para NULL, necessidade do execvp
+    argv_p[k] = 0; //ultima para NULL, necessidade do execvp
+
     pthread_mutex_lock(&lock); //começo o lock
     execvpPar_count++; //var estava dando prob pq era incrementada pelas threads que chegava antes, entao solução foi lockar para cada 1 acessar
     pthread_mutex_unlock(&lock);//termino o lock
     //return argv_p;
-    execvpSeq(argv_p);
+    execvpSeq(argv_p); //posso tentar execuatar por aqui mesmo! evitar algum prob
+
 }
 
 
@@ -221,8 +223,7 @@ int main(int argc, char* argv[]) {
 
                    //sequencial!!
                    //printf("last: %s\n",lastCmd);
-                   if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && styleErr == 0 && histVerify == 0 &&
-                       exitCheck == 0) {
+                   if (strcmp(style, "seq") == 0 && strcmp(cmd, "style")) {
                        //forkar para que o execvp nao encerre o processo atual:
                        execvpSeq(argv);
                    }//fim Sequencial!!
@@ -246,7 +247,7 @@ int main(int argc, char* argv[]) {
 
                //for para analisar o struct criado!!
                for (int l = 0; l < cmd_count; ++l) {
-                  // printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
+                   printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
                }
                 //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
        //execução dos COMANDOS!! (Max. 2);
@@ -255,12 +256,12 @@ int main(int argc, char* argv[]) {
 
                 //separar aqui e depois passar tudo certinho para as thread!! já dividido!!
 
-               // char *cmdArgvPar = execvpParSep(&argvPar);
-                //printf("cmdArgvPar: %s\n",argvPar);
+                //char *cmdArgvPar = execvpParSep(&argvPar);
+                printf("cmdArgvPar: %s\n",argvPar.cmds[1]); //ver issooooooo!!
 
             //testando criacao das threads!!
                 for (int i = 0; i < cmd_count; ++i) {
-                   // printf("cmd_count: %d\n",cmd_count);
+                    printf("cmd_count: %d\n",cmd_count);
                     t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
                     if(t1[i])
                     {
@@ -268,6 +269,7 @@ int main(int argc, char* argv[]) {
                         exit(EXIT_FAILURE);//eroor
                     }
                    // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
+                    printf("t1[%d]: %d\n",i,t1[i]);
                 }
 
            /* Wait till threads are complete before main continues. */
@@ -276,7 +278,6 @@ int main(int argc, char* argv[]) {
                if(pthread_join(thread1[i], NULL)!=0){
                    return 2;
                }
-               pthread_mutex_destroy(&lock); //liberar o acesso depois das threads
                //printf("Thread %d FINISHED\n",i);
                if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
                    execvpPar_count=0;
@@ -285,16 +286,16 @@ int main(int argc, char* argv[]) {
             }
 
         //printf("ultimo %s   \n",lastCmd[1]);
-        cmd_total=0;
         }
-        while (argc>1 && argc<3){
+        while (argc>1 && argc<3){ //para nao entrar
             //peguei o tamanho!!
         // agora pegar o nome do arq -- PEGUEI -- argv[1]
-            printf("NOMEEEE argv: %s\n",argv[1]);
+            printf("NOMEEEE argv: %s\n",argv[1]); //prob esta aqui!! Em usar o argv :/
             pnt=fopen(argv[1],"r+");
             char *cmdString;
             cmdString = fgets(cmd, MAX_LINE, pnt);
             cmdString[strlen(cmdString)-1]=0; //resolve erro do \n no final!!
+            styleCheck(cmd); // checkar o styleeeee!!
             printf("LINHA DO ARQ: %s\n",cmdString);
             fclose(pnt);
 
@@ -339,12 +340,16 @@ int main(int argc, char* argv[]) {
             else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
                 //  printf("AGORA PARALLELO: %s\n",argv[0]);
 
+
                 //inicializando a struct para armazenar os dados! Conforme o tamanho
                 Argv_ParStruct argvPar = {cmd_total};
 
                 for (int l = 0; l < cmd_count; ++l) {
                     argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
                 }
+                styleCheck(cmd); //verificar o estilo anteees!!
+                //verificar o estilo:
+                fprintf(stdout,"NESSE ESTILO: %s\n",cmd);
 
                 //for para analisar o struct criado!!
                 for (int l = 0; l < cmd_count; ++l) {
@@ -378,7 +383,7 @@ int main(int argc, char* argv[]) {
                     if(pthread_join(thread1[i], NULL)!=0){
                         return 2;
                     }
-                    pthread_mutex_destroy(&lock); //liberar o acesso depois das threads
+
                     //printf("Thread %d FINISHED\n",i);
                     if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
                         execvpPar_count=0;
