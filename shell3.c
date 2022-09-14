@@ -81,11 +81,13 @@ char **splitStringSpace(char *string, int *cmdCount) { //posso melhorar isso ne,
 
 int *styleCheck(char *input){ //tbm cmd vazio!!
     int count=0;
-    if(strcmp(input, "style parallel") == 0){
+    if(strstr(input, "style parallel") != NULL){
         strcpy(style, "par");
+        printf("PARALELO\n");
         styleErr=0;
-    }else if (strcmp(input, "style sequential") == 0){
+    }else if (strstr(input, "style sequential") != NULL){
         strcpy(style, "seq");
+        printf("SEQUENCIAL\n");
         styleErr=0;
     }else if(isspace(*input)==0) {
         //printf(" len %ld\n", strlen(cmd));
@@ -227,6 +229,10 @@ int main(int argc, char* argv[]) {
                        //forkar para que o execvp nao encerre o processo atual:
                        execvpSeq(argv);
                    }//fim Sequencial!!
+                   if (strcmp(style, "par") == 0 && strcmp(cmd, "style")) {
+                       //forkar para que o execvp nao encerre o processo atual:
+                       execvpSeq(argv);
+                   }//fim Sequencial!!
                }
            }//fim do for sequencial!!
            cmd_args_count=0;
@@ -346,10 +352,11 @@ int main(int argc, char* argv[]) {
 
                 for (int l = 0; l < cmd_count; ++l) {
                     argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
+                    styleCheck(argvPar.cmds[l]);
                 }
                 styleCheck(cmd); //verificar o estilo anteees!!
                 //verificar o estilo:
-                fprintf(stdout,"NESSE ESTILO: %s\n",cmd);
+
 
                 //for para analisar o struct criado!!
                 for (int l = 0; l < cmd_count; ++l) {
