@@ -9,7 +9,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="going back some changes" />
+    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="going back some changes">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/a.out" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,7 +27,8 @@
         <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/InfraSOImp" />
+    <option name="RESET_MODE" value="HARD" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -61,9 +65,9 @@
     <property name="structure.view.defaults.are.configured" value="true" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
   </component>
@@ -81,7 +85,8 @@
       <workItem from="1662816731383" duration="29466000" />
       <workItem from="1662908663417" duration="6446000" />
       <workItem from="1662915417355" duration="16911000" />
-      <workItem from="1663112940403" duration="1549000" />
+      <workItem from="1663112940403" duration="3211000" />
+      <workItem from="1663197319922" duration="1000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -163,7 +168,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/NEWDev" />
+                        <option value="NewDEV" />
                       </list>
                     </value>
                   </entry>
