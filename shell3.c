@@ -11,6 +11,10 @@
 
 #define MAX_LINE 200 /* 80 chars per line, per command */
 
+#define BUFFER_SIZE 25
+#define READ_END	0
+#define WRITE_END	1
+
 FILE *pnt;
 
 char *args[MAX_LINE/2+1]; //array de ponteiros de char
@@ -301,7 +305,7 @@ int main(int argc, char* argv[]) {
             char *cmdString;
             cmdString = fgets(cmd, MAX_LINE, pnt);
             cmdString[strlen(cmdString)-1]=0; //resolve erro do \n no final!!
-            styleCheck(cmd); // checkar o styleeeee!!
+            fflush(stdout);
             printf("LINHA DO ARQ: %s\n",cmdString);
             fclose(pnt);
 
@@ -309,6 +313,7 @@ int main(int argc, char* argv[]) {
             char **cmdsArray = splitString(cmdString, &cmd_count);
             for (int i = 0; i <= cmd_total ; ++i) {
                 printf("CMDSARRAY: %s\n",cmdsArray[i]);
+                styleCheck(cmdsArray[i]);
             }
 
                 //Corrigir erro quando não consegue abrir o arq!!
@@ -346,17 +351,15 @@ int main(int argc, char* argv[]) {
             else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
                 //  printf("AGORA PARALLELO: %s\n",argv[0]);
 
-
                 //inicializando a struct para armazenar os dados! Conforme o tamanho
                 Argv_ParStruct argvPar = {cmd_total};
 
+
+                //verificar o estilo:
                 for (int l = 0; l < cmd_count; ++l) {
                     argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
                     styleCheck(argvPar.cmds[l]);
                 }
-                styleCheck(cmd); //verificar o estilo anteees!!
-                //verificar o estilo:
-
 
                 //for para analisar o struct criado!!
                 for (int l = 0; l < cmd_count; ++l) {
@@ -404,7 +407,7 @@ int main(int argc, char* argv[]) {
                 break;
             }
         if(argc>=3){
-                fprintf(stderr,"Too many arguments! Choose the correct file\n");
+                fprintf(stderr,"Too many arguments! This Shell only accept one batch file!\n");
                 exit(0);
         }
     }
