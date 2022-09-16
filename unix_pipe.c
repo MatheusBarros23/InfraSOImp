@@ -32,7 +32,7 @@ int main(void)
 		close(fd[READ_END]);
 
 		/* write to the pipe */
-		write(fd[WRITE_END], write_msg, strlen(write_msg)+1); 
+		write(fd[WRITE_END], write_msg, strlen(write_msg)+1);
 
 		/* close the write end of the pipe */
 		close(fd[WRITE_END]);

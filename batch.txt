@@ -1,1 +1,3 @@
-style parallel; echo 123; echo 321; /bin/ps; echo 123; /bin/ps; echo 123; /bin/ps
+echo 321
+echo 111; date; /bin/ls; /bin/ps; exit
+

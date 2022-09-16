@@ -47,6 +47,7 @@ typedef struct
 }Argv_ParStruct;
 
 
+
 //splitar a string!! Tentar ver por strtok
 char **splitString(char *string, int *cmdCount) {
     char delim =';';
@@ -116,6 +117,11 @@ int execvpSeq(char *cmds[]){
         return 1;
     }
     else if(pid == 0){ /* child process */
+        for (int i = 0; i < sizeof(*cmds)/sizeof(cmds[0]) ; ++i) {
+            if(strstr(cmds[i],"exit")){
+                kill(0,9); // Estou recebendo uma mensagem de "Killed"
+            }
+        }
         pid1 = getpid();
         if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")!=0&& strcmp(cmds[0], "style")!=0){
             fprintf(stderr,"Execvp failed: %s not a Command\n",cmds[0]);
@@ -155,6 +161,7 @@ char *execvpPar(Argv_ParStruct *Argv_par){
     execvpSeq(argv_p); //posso tentar execuatar por aqui mesmo! evitar algum prob
 
 }
+
 
 
 int main(int argc, char* argv[]) {
@@ -300,20 +307,30 @@ int main(int argc, char* argv[]) {
         while (argc>1 && argc<3){ //para nao entrar
             //peguei o tamanho!!
         // agora pegar o nome do arq -- PEGUEI -- argv[1]
+
+        // USAR UM FOR PELA QUANTIDADE DE LINHAS!! (\n) DE MODO A EXECUTAR ISSO PARA CADA LINHA QUE TIVER NO ARQUIVO!!
+            //Resolveria o problema ne? Obg @Deus
+
             printf("NOMEEEE argv: %s\n",argv[1]); //prob esta aqui!! Em usar o argv :/
-            pnt=fopen(argv[1],"r+");
-            char *cmdString;
-            cmdString = fgets(cmd, MAX_LINE, pnt);
-            cmdString[strlen(cmdString)-1]=0; //resolve erro do \n no final!!
-            fflush(stdout);
-            printf("LINHA DO ARQ: %s\n",cmdString);
-            fclose(pnt);
+
+                pnt=fopen(argv[1],"r+");
+            //cmdString = fgets(cmd, MAX_LINE, pnt);
+           // cmdString[strlen(cmdString)-1]=0;           // --->> resolve erro do \n no final!!
+                char * cmdString = NULL;
+                size_t len = 0;
+                ssize_t read;
+
+                while ((read = getline(&cmdString, &len, pnt)) != -1) {
+                    //printf("DENTRO WHILE: %s", cmdString);
+
+
 
             //LIMPAR A STRING!!
             char **cmdsArray = splitString(cmdString, &cmd_count);
             for (int i = 0; i <= cmd_total ; ++i) {
-                printf("CMDSARRAY: %s\n",cmdsArray[i]);
+               // printf("CMDSARRAY: %s\n",cmdsArray[i]);
                 styleCheck(cmdsArray[i]);
+                //COLOCAR O EXIT AQUI
             }
 
                 //Corrigir erro quando não consegue abrir o arq!!
@@ -347,14 +364,20 @@ int main(int argc, char* argv[]) {
                 histVerify=0;
             }
             //fim sequencial
+                    fflush(stdin);
+                }
+
+            printf("LINHA DO ARQ: %s\n",cmdString);
+            fclose(pnt);
+            //ADICIONAR CORREÇÂO BATCH NO PARALLE
             //executar paralelo
-            else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
+            if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
                 //  printf("AGORA PARALLELO: %s\n",argv[0]);
 
                 //inicializando a struct para armazenar os dados! Conforme o tamanho
                 Argv_ParStruct argvPar = {cmd_total};
 
-
+                char** cmdsArray;
                 //verificar o estilo:
                 for (int l = 0; l < cmd_count; ++l) {
                     argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
@@ -416,7 +439,7 @@ int main(int argc, char* argv[]) {
 }
 
 
-//BATCH - pegar o arq!
+//BATCH
 //PIPE
 //BACKGROUND &
 
@@ -426,4 +449,3 @@ int main(int argc, char* argv[]) {
             }
             */
 
-// PRECISO COLOCAR UM CHECK DO STYLE ANTES DE CADA EXECUÃO!!
