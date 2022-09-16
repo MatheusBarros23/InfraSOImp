@@ -11,10 +11,6 @@
 
 #define MAX_LINE 200 /* 80 chars per line, per command */
 
-#define BUFFER_SIZE 25
-#define READ_END	0
-#define WRITE_END	1
-
 FILE *pnt;
 
 char *args[MAX_LINE/2+1]; //array de ponteiros de char
@@ -45,7 +41,6 @@ typedef struct
     int size;
     char* cmds[MAX_LINE/2+1];
 }Argv_ParStruct;
-
 
 
 //splitar a string!! Tentar ver por strtok
@@ -86,13 +81,11 @@ char **splitStringSpace(char *string, int *cmdCount) { //posso melhorar isso ne,
 
 int *styleCheck(char *input){ //tbm cmd vazio!!
     int count=0;
-    if(strstr(input, "style parallel") != NULL){
+    if(strcmp(input, "style parallel") == 0){
         strcpy(style, "par");
-        printf("PARALELO\n");
         styleErr=0;
-    }else if (strstr(input, "style sequential") != NULL){
+    }else if (strcmp(input, "style sequential") == 0){
         strcpy(style, "seq");
-        printf("SEQUENCIAL\n");
         styleErr=0;
     }else if(isspace(*input)==0) {
         //printf(" len %ld\n", strlen(cmd));
@@ -102,8 +95,8 @@ int *styleCheck(char *input){ //tbm cmd vazio!!
             }
         }
         //if(count== strlen(input) && strcmp(input,"!!")&&execWorked==0){
-         //   fprintf(stderr,"No commands\n");
-       // }
+        //   fprintf(stderr,"No commands\n");
+        // }
     }
 }
 
@@ -117,11 +110,6 @@ int execvpSeq(char *cmds[]){
         return 1;
     }
     else if(pid == 0){ /* child process */
-        for (int i = 0; i < sizeof(*cmds)/sizeof(cmds[0]) ; ++i) {
-            if(strstr(cmds[i],"exit")){
-                kill(0,9); // Estou recebendo uma mensagem de "Killed"
-            }
-        }
         pid1 = getpid();
         if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")!=0&& strcmp(cmds[0], "style")!=0){
             fprintf(stderr,"Execvp failed: %s not a Command\n",cmds[0]);
@@ -137,7 +125,6 @@ int execvpSeq(char *cmds[]){
 /*
     Tenho que separar o que cada processo vai alterar! De modo que as alterações de uma thread não
     impliquem em alterações nas outras!
-
         Acessam o mesmo espaço de memória. Que está sendo modificado.
 */
 char *execvpPar(Argv_ParStruct *Argv_par){
@@ -163,111 +150,106 @@ char *execvpPar(Argv_ParStruct *Argv_par){
 }
 
 
-
 int main(int argc, char* argv[]) {
     int retorno=0;
 
     while (should_run < 2) {
         while (argc==1){
-        printf("mprb %s> ", style);
-        fflush(stdout);
+            printf("mprb %s> ", style);
+            fflush(stdout);
 
-        //pegar o input do usuario e dividir a string
-        //user input Keyboard
-        fgets(cmd, MAX_LINE, stdin);
-        cmd[strlen(cmd) - 1] = 0;
-        fflush(stdout);
+            //pegar o input do usuario e dividir a string
+            //user input Keyboard
+            fgets(cmd, MAX_LINE, stdin);
+            cmd[strlen(cmd) - 1] = 0;
+            fflush(stdout);
 
-        printf("CMD: %s\n",cmd);
+            printf("CMD: %s\n",cmd);
 
-        //verificar Exit:
-        if (strcmp(cmd, "exit") == 0) {
-            printf("== Shell encerrado! ==\n");
-            exitCheck=1;
-            should_run=3;//condicao de saida
+            //verificar Exit:
+            if (strcmp(cmd, "exit") == 0) {
+                printf("== Shell encerrado! ==\n");
+                exitCheck=1;
+                should_run=3;//condicao de saida
 
-            break;
-        }
+                break;
+            }
 
 
-            //verificar !! :                //FAZER O HISTORICO!!
-        else if (strcmp(cmd, "!!") == 0){
-            if(strcmp(argv[0], "!!") != 0){
-                //fprintf(stdout, "%s\n",argv[0]);
-                if(strcmp(style,"seq")==0){
-                    retorno = execvpSeq(argv);
-                }else if(strcmp(style,"par")==0){
-                    retorno = execvpSeq(argv); //arrumar isso!! para aceitar tbm argv no execvpPar
-                }
-                if(retorno>0){
-                }else{
-                   fprintf(stdout, "No commands\n");
+                //verificar !! :                //FAZER O HISTORICO!!
+            else if (strcmp(cmd, "!!") == 0){
+                if(strcmp(argv[0], "!!") != 0){
+                    //fprintf(stdout, "%s\n",argv[0]);
+                    if(strcmp(style,"seq")==0){
+                        retorno = execvpSeq(argv);
+                    }else if(strcmp(style,"par")==0){
+                        retorno = execvpSeq(argv); //arrumar isso!! para aceitar tbm argv no execvpPar
+                    }
+                    if(retorno>0){
+                    }else{
+                        fprintf(stdout, "No commands\n");
+                    }
                 }
             }
-        }
 
-        //verificar mudança de estilo!
-        styleCheck(cmd);
+            //verificar mudança de estilo!
+            styleCheck(cmd);
 
-        //Splittar os Comandos pela ;
-        char **cmdsArray = splitString(cmd, &cmd_count);
+            //Splittar os Comandos pela ;
+            char **cmdsArray = splitString(cmd, &cmd_count);
 
-        for (int i = 0; i <= cmd_total; ++i) {
-           // printf("CMDSARRAY: %s\n",cmdsArray[i]);
-        }
+            for (int i = 0; i <= cmd_total; ++i) {
+                // printf("CMDSARRAY: %s\n",cmdsArray[i]);
+            }
 
 
 
 //Executar os comandos!!
-        //printf("CMDTOTAL: %d\n",cmd_total);
-       if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!")) {
-           for (int i = 0; i <= cmd_total; ++i) {
-               //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
-               for (int j = 0; j <= cmd_args_count; ++j) {
-                   char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
-                   txt = strtok(cmdsArray[i], " ");
-                   int k = 0;
-                   while (txt != NULL) {
-                       argv[k] = txt;
-                       txt = strtok(NULL, " ");
-                       k++;
-                   }
-                   argv[k] = NULL; //ultima para NULL, necessidade do execvp
+            //printf("CMDTOTAL: %d\n",cmd_total);
+            if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!")) {
+                for (int i = 0; i <= cmd_total; ++i) {
+                    //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
+                    for (int j = 0; j <= cmd_args_count; ++j) {
+                        char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
+                        txt = strtok(cmdsArray[i], " ");
+                        int k = 0;
+                        while (txt != NULL) {
+                            argv[k] = txt;
+                            txt = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv[k] = NULL; //ultima para NULL, necessidade do execvp
 
-                   //sequencial!!
-                   //printf("last: %s\n",lastCmd);
-                   if (strcmp(style, "seq") == 0 && strcmp(cmd, "style")) {
-                       //forkar para que o execvp nao encerre o processo atual:
-                       execvpSeq(argv);
-                   }//fim Sequencial!!
-                   if (strcmp(style, "par") == 0 && strcmp(cmd, "style")) {
-                       //forkar para que o execvp nao encerre o processo atual:
-                       execvpSeq(argv);
-                   }//fim Sequencial!!
-               }
-           }//fim do for sequencial!!
-           cmd_args_count=0;
-           cmd_total=0;
-           histVerify=0;
-       }
+                        //sequencial!!
+                        //printf("last: %s\n",lastCmd);
+                        if (strcmp(style, "seq") == 0 && strcmp(cmd, "style")) {
+                            //forkar para que o execvp nao encerre o processo atual:
+                            execvpSeq(argv);
+                        }//fim Sequencial!!
+                    }
+                }//fim do for sequencial!!
+                cmd_args_count=0;
+                cmd_total=0;
+                histVerify=0;
+            }
 
-           //inicio Paralelo
+                //inicio Paralelo
             else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
-             //  printf("AGORA PARALLELO: %s\n",argv[0]);
+                //  printf("AGORA PARALLELO: %s\n",argv[0]);
 
-               //inicializando a struct para armazenar os dados! Conforme o tamanho
-               Argv_ParStruct argvPar = {cmd_total};
+                //inicializando a struct para armazenar os dados! Conforme o tamanho
+                Argv_ParStruct argvPar = {cmd_total};
 
-               for (int l = 0; l < cmd_count; ++l) {
-                   argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
-               }
+                for (int l = 0; l < cmd_count; ++l) {
+                    argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
+                }
 
-               //for para analisar o struct criado!!
-               for (int l = 0; l < cmd_count; ++l) {
-                   printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
-               }
+                //for para analisar o struct criado!!
+                for (int l = 0; l < cmd_count; ++l) {
+                    printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
+                }
                 //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
-       //execução dos COMANDOS!! (Max. 2);
+                //execução dos COMANDOS!! (Max. 2);
                 pthread_t thread1[cmd_count];
                 int  t1[cmd_count];
 
@@ -276,7 +258,7 @@ int main(int argc, char* argv[]) {
                 //char *cmdArgvPar = execvpParSep(&argvPar);
                 printf("cmdArgvPar: %s\n",argvPar.cmds[1]); //ver issooooooo!!
 
-            //testando criacao das threads!!
+                //testando criacao das threads!!
                 for (int i = 0; i < cmd_count; ++i) {
                     printf("cmd_count: %d\n",cmd_count);
                     t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
@@ -285,57 +267,46 @@ int main(int argc, char* argv[]) {
                         fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
                         exit(EXIT_FAILURE);//eroor
                     }
-                   // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
+                    // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
                     printf("t1[%d]: %d\n",i,t1[i]);
                 }
 
-           /* Wait till threads are complete before main continues. */
+                /* Wait till threads are complete before main continues. */
                 //FOR usado para juntar todos as threads criadas, de modo a esperar o wait da main!
-           for (int i = 0; i < cmd_count; ++i) {
-               if(pthread_join(thread1[i], NULL)!=0){
-                   return 2;
-               }
-               //printf("Thread %d FINISHED\n",i);
-               if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
-                   execvpPar_count=0;
-               }
-           }
+                for (int i = 0; i < cmd_count; ++i) {
+                    if(pthread_join(thread1[i], NULL)!=0){
+                        return 2;
+                    }
+                    //printf("Thread %d FINISHED\n",i);
+                    if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
+                        execvpPar_count=0;
+                    }
+                }
             }
 
-        //printf("ultimo %s   \n",lastCmd[1]);
+            //printf("ultimo %s   \n",lastCmd[1]);
         }
         while (argc>1 && argc<3){ //para nao entrar
             //peguei o tamanho!!
-        // agora pegar o nome do arq -- PEGUEI -- argv[1]
-
-        // USAR UM FOR PELA QUANTIDADE DE LINHAS!! (\n) DE MODO A EXECUTAR ISSO PARA CADA LINHA QUE TIVER NO ARQUIVO!!
-            //Resolveria o problema ne? Obg @Deus
-
+            // agora pegar o nome do arq -- PEGUEI -- argv[1]
             printf("NOMEEEE argv: %s\n",argv[1]); //prob esta aqui!! Em usar o argv :/
-
-                pnt=fopen(argv[1],"r+");
-            //cmdString = fgets(cmd, MAX_LINE, pnt);
-           // cmdString[strlen(cmdString)-1]=0;           // --->> resolve erro do \n no final!!
-                char * cmdString = NULL;
-                size_t len = 0;
-                ssize_t read;
-
-                while ((read = getline(&cmdString, &len, pnt)) != -1) {
-                    //printf("DENTRO WHILE: %s", cmdString);
-
-
+            pnt=fopen(argv[1],"r+");
+            char *cmdString;
+            cmdString = fgets(cmd, MAX_LINE, pnt);
+            cmdString[strlen(cmdString)-1]=0; //resolve erro do \n no final!!
+            styleCheck(cmd); // checkar o styleeeee!!
+            printf("LINHA DO ARQ: %s\n",cmdString);
+            fclose(pnt);
 
             //LIMPAR A STRING!!
             char **cmdsArray = splitString(cmdString, &cmd_count);
             for (int i = 0; i <= cmd_total ; ++i) {
-               // printf("CMDSARRAY: %s\n",cmdsArray[i]);
-                styleCheck(cmdsArray[i]);
-                //COLOCAR O EXIT AQUI
+                printf("CMDSARRAY: %s\n",cmdsArray[i]);
             }
 
-                //Corrigir erro quando não consegue abrir o arq!!
+            //Corrigir erro quando não consegue abrir o arq!!
 
-                // executar quando sequencial:
+            // executar quando sequencial:
             if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!")) {
                 for (int i = 0; i <= cmd_total; ++i) {
                     //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
@@ -363,26 +334,21 @@ int main(int argc, char* argv[]) {
                 cmd_total=0;
                 histVerify=0;
             }
-            //fim sequencial
-                    fflush(stdin);
-                }
-
-            printf("LINHA DO ARQ: %s\n",cmdString);
-            fclose(pnt);
-            //ADICIONAR CORREÇÂO BATCH NO PARALLE
-            //executar paralelo
-            if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
+                //fim sequencial
+                //executar paralelo
+            else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
                 //  printf("AGORA PARALLELO: %s\n",argv[0]);
+
 
                 //inicializando a struct para armazenar os dados! Conforme o tamanho
                 Argv_ParStruct argvPar = {cmd_total};
 
-                char** cmdsArray;
-                //verificar o estilo:
                 for (int l = 0; l < cmd_count; ++l) {
                     argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
-                    styleCheck(argvPar.cmds[l]);
                 }
+                styleCheck(cmd); //verificar o estilo anteees!!
+                //verificar o estilo:
+                fprintf(stdout,"NESSE ESTILO: %s\n",cmd);
 
                 //for para analisar o struct criado!!
                 for (int l = 0; l < cmd_count; ++l) {
@@ -424,14 +390,14 @@ int main(int argc, char* argv[]) {
                 }
             }
             //FIM PARALLELO
-                //condição de saida quando não consigo abrir aqr!
-                should_run=3;
-                //print shell encerrado!!
-                break;
-            }
+            //condição de saida quando não consigo abrir aqr!
+            should_run=3;
+            //print shell encerrado!!
+            break;
+        }
         if(argc>=3){
-                fprintf(stderr,"Too many arguments! This Shell only accept one batch file!\n");
-                exit(0);
+            fprintf(stderr,"Too many arguments! Choose the correct file\n");
+            exit(0);
         }
     }
 
@@ -439,7 +405,7 @@ int main(int argc, char* argv[]) {
 }
 
 
-//BATCH
+//BATCH - pegar o arq!
 //PIPE
 //BACKGROUND &
 
@@ -449,3 +415,4 @@ int main(int argc, char* argv[]) {
             }
             */
 
+// PRECISO COLOCAR UM CHECK DO STYLE ANTES DE CADA EXECUÃO!!

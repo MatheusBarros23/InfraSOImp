@@ -1,3 +1,3 @@
-echo 321
-echo 111; date; /bin/ls; /bin/ps; exit
-
+echo 123; echo 312; date; ps; ls
+/bin/ls; date
+date; echo 312
