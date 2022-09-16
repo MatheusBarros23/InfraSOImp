@@ -9,11 +9,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="going back some changes">
+    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Pipe organization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/a.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/batch.txt" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/batch.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/shell3.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell3.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp/unix_pipe.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/unix_pipe.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/teste.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/teste.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +22,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="Git.Settings">
@@ -66,13 +68,6 @@
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="structure.view.defaults.are.configured" value="true" />
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -88,7 +83,8 @@
       <workItem from="1662908663417" duration="6446000" />
       <workItem from="1662915417355" duration="16911000" />
       <workItem from="1663112940403" duration="3211000" />
-      <workItem from="1663197319922" duration="3793000" />
+      <workItem from="1663197319922" duration="3825000" />
+      <workItem from="1663332081086" duration="32889000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -160,7 +156,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663197464432</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Pipe organization">
+      <created>1663204892789</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1663204892789</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,7 +180,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="NewDEV" />
+                        <option value="origin/NewDEV" />
                       </list>
                     </value>
                   </entry>
@@ -219,6 +222,7 @@
     <MESSAGE value="add threads and parallel behavior" />
     <MESSAGE value="changes and creating bugs" />
     <MESSAGE value="going back some changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="going back some changes" />
+    <MESSAGE value="Pipe organization" />
+    <option name="LAST_COMMIT_MESSAGE" value="Pipe organization" />
   </component>
 </project>
