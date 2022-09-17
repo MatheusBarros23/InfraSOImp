@@ -9,12 +9,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Pipe organization">
+    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Going back... again">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/a.out" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/batch.txt" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/batch.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/shell3.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell3.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp/teste.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/teste.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +33,7 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/InfraSOImp" />
     <option name="RESET_MODE" value="HARD" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -84,7 +85,8 @@
       <workItem from="1662915417355" duration="16911000" />
       <workItem from="1663112940403" duration="3211000" />
       <workItem from="1663197319922" duration="3825000" />
-      <workItem from="1663332081086" duration="32889000" />
+      <workItem from="1663332081086" duration="34185000" />
+      <workItem from="1663427176195" duration="5009000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -163,7 +165,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663204892789</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Going back... again">
+      <created>1663367422708</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1663367422708</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -223,6 +232,7 @@
     <MESSAGE value="changes and creating bugs" />
     <MESSAGE value="going back some changes" />
     <MESSAGE value="Pipe organization" />
-    <option name="LAST_COMMIT_MESSAGE" value="Pipe organization" />
+    <MESSAGE value="Going back... again" />
+    <option name="LAST_COMMIT_MESSAGE" value="Going back... again" />
   </component>
 </project>
