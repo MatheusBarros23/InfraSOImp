@@ -290,19 +290,25 @@ int main(int argc, char* argv[]) {
             //peguei o tamanho!!
             // agora pegar o nome do arq -- PEGUEI -- argv[1]
             printf("NOMEEEE argv: %s\n",argv[1]); //prob esta aqui!! Em usar o argv :/
-            pnt=fopen(argv[1],"r+");
-            char *cmdString;
-            cmdString = fgets(cmd, MAX_LINE, pnt);
-            cmdString[strlen(cmdString)-1]=0; //resolve erro do \n no final!!
-            styleCheck(cmd); // checkar o styleeeee!!
-            printf("LINHA DO ARQ: %s\n",cmdString);
+
+            char *cmdString = malloc(MAX_LINE * sizeof(char *)); //criar dinamicamente array
+
+            pnt=fopen(argv[1],"r");
+            while (fscanf(pnt, "%[^\n] ", cmdString) != EOF ) {
+                printf("> %s\n", cmdString);
+                char **cmdsArray = splitString(cmdString, &cmd_count);
+                for (int i = 0; i <= cmd_total ; ++i) {
+                    printf("CMDSARRAY: %s\n",cmdsArray[i]);
+                }
+                char *cmdString = malloc(MAX_LINE * sizeof(char *)); //criar dinamicamente array
+            }
             fclose(pnt);
 
             //LIMPAR A STRING!!
-            char **cmdsArray = splitString(cmdString, &cmd_count);
+           /* char **cmdsArray = splitString(cmdString, &cmd_count);
             for (int i = 0; i <= cmd_total ; ++i) {
                 printf("CMDSARRAY: %s\n",cmdsArray[i]);
-            }
+            } */
 
             //Corrigir erro quando não consegue abrir o arq!!
 

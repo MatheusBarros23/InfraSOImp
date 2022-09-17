@@ -1,3 +1,2 @@
 echo 123; echo 312; date; ps; ls
-/bin/ls; date
-date; echo 312
+date
