@@ -9,11 +9,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="COMPLETE BATCH!! Focuos on using Pipe!!">
+    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Start Pipe implementation:&#10;Sequential Behavior">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp/batch.txt" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/batch.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/a.out" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/shell3.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell3.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/teste.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/teste.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/unix_pipe.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/unix_pipe.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +88,7 @@
       <workItem from="1663197319922" duration="3825000" />
       <workItem from="1663332081086" duration="34185000" />
       <workItem from="1663427176195" duration="12669000" />
-      <workItem from="1663513797017" duration="2850000" />
+      <workItem from="1663513797017" duration="14460000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -186,7 +188,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663442335500</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Start Pipe implementation:&#10;Sequential Behavior">
+      <created>1663517676519</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1663517676519</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,6 +258,7 @@
     <MESSAGE value="Going back... again" />
     <MESSAGE value="Using fscanf!! Pre changes!!" />
     <MESSAGE value="COMPLETE BATCH!! Focuos on using Pipe!!" />
-    <option name="LAST_COMMIT_MESSAGE" value="COMPLETE BATCH!! Focuos on using Pipe!!" />
+    <MESSAGE value="Start Pipe implementation:&#10;Sequential Behavior" />
+    <option name="LAST_COMMIT_MESSAGE" value="Start Pipe implementation:&#10;Sequential Behavior" />
   </component>
 </project>
