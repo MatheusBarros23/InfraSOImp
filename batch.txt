@@ -2,6 +2,9 @@ echo 123; echo 312; date; ps; ls
 date
 style sequential
 echo 123; ps; echo 321
+ls -l | sort -k 5
 style parallel
-ps; echo 321
+ps; echo 321; ls
+style sequential
+echo 123
 exit

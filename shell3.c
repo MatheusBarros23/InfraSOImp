@@ -62,19 +62,20 @@ char **splitString(char *string, int *cmdCount) {
     return array;
 }
 
-char **splitStringSpace(char *string, int *cmdCount) { //posso melhorar isso ne, plmd
-    char delim =' ';
-    *cmdCount =1;
-    char **array = malloc(*cmdCount * sizeof(char *)); //criar dinamicamente array
+char **splitStringPipe(char *string, int *cmdCountPipe) { //legal fazer isso só antes da execução!
+    char delim ='|';
+    *cmdCountPipe =1;
+    char **array = malloc(*cmdCountPipe * sizeof(char *)); //criar dinamicamente array
     array[0] = &string[0]; //armazena no array a posicao de cada comando
     for (int i = 1; string[i] != 0; i++) {
         if (string[i] == delim) {
-            (*cmdCount)++;
-            array = realloc(array, sizeof(char *) * (*cmdCount));
-            array[(*cmdCount) - 1] = &string[i + 1];
-            string[i] = '\0';
-            cmd_args_count++;
+            (*cmdCountPipe)++;
+            array = realloc(array, sizeof(char *) * (*cmdCountPipe));
+            array[(*cmdCountPipe) - 1] = &string[i + 1];
+            string[i] = 0;
+            cmd_total++;
         }
+        //  printf("array[i]: %s %i\n",*array,i);
     }
     return array;
 }
@@ -203,9 +204,14 @@ int main(int argc, char* argv[]) {
             //Splittar os Comandos pela ;
             char **cmdsArray = splitString(cmd, &cmd_count);
 
-            for (int i = 0; i <= cmd_total; ++i) {
-                // printf("CMDSARRAY: %s\n",cmdsArray[i]);
-            }
+          /*  for (int i = 0; i <= cmd_total; ++i) {
+                 printf("CMDSARRAY: %s\n",cmdsArray[i]);
+                 if(strstr(cmdsArray[i],"|")==NULL){
+                     printf("NAO TEM PIPE\n");
+                 }else{
+                     printf("TEM PIPE\n");
+                 }
+            }*/
 
 
 
@@ -213,24 +219,35 @@ int main(int argc, char* argv[]) {
             //printf("CMDTOTAL: %d\n",cmd_total);
             if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!")) {
                 for (int i = 0; i <= cmd_total; ++i) {
-                    //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
+                    //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL) - per space!!
                     for (int j = 0; j <= cmd_args_count; ++j) {
-                        char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
-                        txt = strtok(cmdsArray[i], " ");
-                        int k = 0;
-                        while (txt != NULL) {
-                            argv[k] = txt;
-                            txt = strtok(NULL, " ");
-                            k++;
-                        }
-                        argv[k] = NULL; //ultima para NULL, necessidade do execvp
+                       //if para verificar se tem | - pipe!!
+                        if(strstr(cmdsArray[i],"|")==NULL){
+                            char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
+                            txt = strtok(cmdsArray[i], " ");
+                            int k = 0;
+                            while (txt != NULL) {
+                                argv[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv[k] = NULL; //ultima para NULL, necessidade do execvp
 
-                        //sequencial!!
-                        //printf("last: %s\n",lastCmd);
-                        if (strcmp(style, "seq") == 0 && strcmp(cmd, "style")) {
-                            //forkar para que o execvp nao encerre o processo atual:
-                            execvpSeq(argv);
-                        }//fim Sequencial!!
+                            //sequencial!!
+                            //printf("last: %s\n",lastCmd);
+                            if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i],"|")==NULL) {
+                                //forkar para que o execvp nao encerre o processo atual:
+                                execvpSeq(argv);
+                            }//fim Sequencial!!
+
+                        }else{
+                            //preciso separar novamnente pelo | pipe
+                            cmd_total=0;
+                            char **cmdsArrayPipe = splitStringPipe(*cmdsArray, &cmd_count);
+                            for (int i = 0; i <= 2; ++i) {
+                                printf("CMDSARRAYPIPE: %s\n", cmdsArrayPipe[i]);
+                            }
+                        }
                     }
                 }//fim do for sequencial!!
                 cmd_args_count=0;
@@ -300,6 +317,7 @@ int main(int argc, char* argv[]) {
 
             pnt=fopen(argv[1],"r");
             while (fscanf(pnt, "%[^\n] ", cmdString) != EOF ){
+                //podia aqui usar um realoc, talvez fosse melhor! Mas esta funcionando o/
                 cmdString[strlen(cmdString) - 1] = 0; // ISSO RESOLVEU (pq tira o ultimo!!)
                // printf("%ld\n", strlen(cmdString));
                 printf("> [%s]\n", cmdString);
@@ -401,8 +419,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
-
-            }
+        }
             fclose(pnt);
             //FIM PARALLELO
             //condição de saida quando não consigo abrir aqr!
@@ -420,7 +437,7 @@ int main(int argc, char* argv[]) {
 }
 
 
-//BATCH - pegar o arq!
+
 //PIPE
 //BACKGROUND &
 
