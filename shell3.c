@@ -10,6 +10,8 @@
 
 
 #define MAX_LINE 200 /* 80 chars per line, per command */
+#define READ_END	0
+#define WRITE_END	1
 
 FILE *pnt;
 
@@ -19,7 +21,9 @@ char *texto;
 char style[4]="seq";
 int styleErr=0;
 int cmd_count;
+int cmd_count_pipe;
 int cmd_total=0;
+int cmd_total_pipe=0;
 int cmd_args_count=0;
 char *cmd_clean[MAX_LINE];
 int execWorked=0;
@@ -29,7 +33,12 @@ int histVerify=0;
 int exitCheck =0;
 int should_run = 1;        /* flag to help exit program*/
 int execvpPar_count=0; /* flag to help count the execvpar calls*/
+int execvpPipe_count=0; /*Help pipe behavor*/
 char *argv_p[MAX_LINE/2+1];
+char *argv_pipe[MAX_LINE/2+1];
+char *argv_pipe2[MAX_LINE/2+1];
+char *read_msg;
+
 
 //lokar o contador para não dar prob quando passar as strings!!
 pthread_mutex_t lock;
@@ -41,6 +50,12 @@ typedef struct
     int size;
     char* cmds[MAX_LINE/2+1];
 }Argv_ParStruct;
+
+typedef struct
+{
+    int size;
+    char* cmds[MAX_LINE/2+1];
+}Argv_PIPEStruct;
 
 
 //splitar a string!! Tentar ver por strtok
@@ -73,7 +88,7 @@ char **splitStringPipe(char *string, int *cmdCountPipe) { //legal fazer isso só
             array = realloc(array, sizeof(char *) * (*cmdCountPipe));
             array[(*cmdCountPipe) - 1] = &string[i + 1];
             string[i] = 0;
-            cmd_total++;
+            cmd_total_pipe++;
         }
         //  printf("array[i]: %s %i\n",*array,i);
     }
@@ -127,10 +142,26 @@ int execvpSeq(char *cmds[]){
         wait(NULL);
     }
 }
+
+int execvpSeqPipe(char *cmds[], char *cmds2[]){
+    pid_t pid;
+    int pid1;
+    int pipefd[2];
+
+    /* create the pipe */
+    if (pipe(pipefd) == -1) {
+        fprintf(stderr,"Pipe failed");
+        return 1;
+    }
+    /* fork a child process */
+
+    //DESCOBRIR COMO USAR DUP2()!! para pegar a saida de um!
+}
+
 /*
     Tenho que separar o que cada processo vai alterar! De modo que as alterações de uma thread não
     impliquem em alterações nas outras!
-        Acessam o mesmo espaço de memória. Que está sendo modificado.
+        Acessam o mesmo espaço de memória. Que está sendo modificado. \/ MUTEX LOCK resolveu isso!
 */
 char *execvpPar(Argv_ParStruct *Argv_par){
     // splitar cada Argv_par->cmds[execvpPar_count] em um cmd e args e chamar a execução!!
@@ -222,6 +253,7 @@ int main(int argc, char* argv[]) {
                     //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL) - per space!!
                     for (int j = 0; j <= cmd_args_count; ++j) {
                        //if para verificar se tem | - pipe!!
+                       printf("cmdsArray[i] %s\n",cmdsArray[i]);
                         if(strstr(cmdsArray[i],"|")==NULL){
                             char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
                             txt = strtok(cmdsArray[i], " ");
@@ -241,12 +273,47 @@ int main(int argc, char* argv[]) {
                             }//fim Sequencial!!
 
                         }else{
+                            /*
+                             Situação:
+                                Tenho as 2 linhas separadas! em um array
+                                O que preciso fazer é mandar o cmd + args do 1 para o child e
+                                                               cmd + args do 2 para o pai!
+                                                   Poderia fazer uma struct? Acho que seria mais tranquilo assim!
+                             */
                             //preciso separar novamnente pelo | pipe
-                            cmd_total=0;
-                            char **cmdsArrayPipe = splitStringPipe(*cmdsArray, &cmd_count);
-                            for (int i = 0; i <= 2; ++i) {
-                                printf("CMDSARRAYPIPE: %s\n", cmdsArrayPipe[i]);
+                            char **cmdsArrayPipe = splitStringPipe(cmdsArray[i], &cmd_count_pipe);
+
+                            for (int i = 0; i <= cmd_count; ++i) {
+                               printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[1]);
+                            //splitar o cmd dos args!!
                             }
+                    //para o child
+                            char *txt;
+                            txt = strtok(cmdsArrayPipe[0], " ");
+                            int k = 0;
+
+                            while (txt != NULL) {
+                                argv_pipe[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
+                            printf("argv_pipe[0]: %s\n",argv_pipe[0]);
+                    //para o pai
+
+                            char *txt2;
+                            txt2 = strtok(cmdsArrayPipe[1], " ");
+                            k = 0;
+
+                            while (txt2 != NULL) {
+                                argv_pipe2[k] = txt2;
+                                txt2 = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_pipe2[k] = 0; //ultima para NULL, necessidade do execvp
+
+                            //esta tudo aqui!!
+                            execvpSeqPipe(argv_pipe,argv_pipe2);
                         }
                     }
                 }//fim do for sequencial!!
