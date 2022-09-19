@@ -143,9 +143,7 @@ int execvpSeq(char *cmds[]){
     }
 }
 
-int execvpSeqPipe(char *cmds[], char *cmds2[]){
-    pid_t pid;
-    int pid1;
+int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
     int pipefd[2];
 
     /* create the pipe */
@@ -153,8 +151,46 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){
         fprintf(stderr,"Pipe failed");
         return 1;
     }
-    /* fork a child process */
 
+    /* fork a child process */
+    int pid1 = fork();
+    if(pid1 < 0){ /* error occured */
+        fprintf(stderr, "Comando falhou! Fork failed!");
+        return 2;
+    }
+
+    if(pid1==0){
+        dup2(pipefd[1],STDOUT_FILENO); //to write
+        close(pipefd[0]);
+        close(pipefd[1]); //we dont use this
+        //execlp("ping","ping","-c", "5","google.com",NULL); //com esse teste funciona!!
+        execvp(cmds[0],cmds);
+    }
+
+    /*fork a 2nd process*/
+    int pid2;
+    pid2 = fork();
+    if(pid2 < 0){ /* error occured */
+        fprintf(stderr, "Comando falhou! Fork failed! PIPE2");
+        return 3;
+    }
+
+    if(pid2==0){ /*Recive process*/
+        dup2(pipefd[0],STDIN_FILENO); //to read
+        close(pipefd[0]);
+        close(pipefd[1]);
+        //execlp("grep","grep","rtt",NULL);
+        execvp(cmds2[0],cmds2);
+    }
+
+    //fechar os handles do processo pai
+    close(pipefd[0]);
+    close(pipefd[1]);
+
+//posso fazer um for aqui!
+    waitpid(pid1,NULL,0);
+    waitpid(pid2,NULL,0);
+    return 0;
     //DESCOBRIR COMO USAR DUP2()!! para pegar a saida de um!
 }
 
@@ -284,7 +320,7 @@ int main(int argc, char* argv[]) {
                             char **cmdsArrayPipe = splitStringPipe(cmdsArray[i], &cmd_count_pipe);
 
                             for (int i = 0; i <= cmd_count; ++i) {
-                               printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[1]);
+                               printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
                             //splitar o cmd dos args!!
                             }
                     //para o child
@@ -506,6 +542,7 @@ int main(int argc, char* argv[]) {
 
 
 //PIPE
+    //Consegui o sequencial!! Focar no paralelo e depois no batch!
 //BACKGROUND &
 
 /* int len = sizeof(*argv)/sizeof(argv[0]);
