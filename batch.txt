@@ -1,9 +1,7 @@
 echo 123; echo 312; date; ps; ls
 date
-style parallel
 echo 123; ps; echo 321
 ls -la | sort -k 5; echo 213
 ps; echo 321; ls
 style parallel
 echo 123; echo 312; date; ps; ls
-exit
