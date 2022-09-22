@@ -14,6 +14,7 @@
 #define WRITE_END	1
 
 FILE *pnt;
+FILE *arqRed;
 
 char *args[MAX_LINE/2+1]; //array de ponteiros de char
 char cmd[MAX_LINE]; //user Inputs
@@ -22,8 +23,10 @@ char style[4]="seq";
 int styleErr=0;
 int cmd_count;
 int cmd_count_pipe;
+int cmd_count_red;
 int cmd_total=0;
 int cmd_total_pipe=0;
+int cmd_total_red=0;
 int cmd_args_count=0;
 char *cmd_clean[MAX_LINE];
 int execWorked=0;
@@ -37,6 +40,8 @@ int execvpPipe_count=0; /*Help pipe behavor*/
 char *argv_p[MAX_LINE/2+1];
 char *argv_pipe[MAX_LINE/2+1];
 char *argv_pipe2[MAX_LINE/2+1];
+char *argv_Red[MAX_LINE/2+1];
+char *argv_Red2[MAX_LINE/2+1];
 char *read_msg;
 int h=0; //para contar linhas
 
@@ -97,24 +102,25 @@ char **splitStringPipe(char *string, int *cmdCountPipe) { //legal fazer isso só
     return array;
 }
 
-char **splitStringRed(char *string, int *cmdCountPipe) { //legal fazer isso só antes da execução!
-    char delim ='>'; //vao se 3: > < e >>
-    *cmdCountPipe =1;
-    char **array = malloc(*cmdCountPipe * sizeof(char *)); //criar dinamicamente array
+char **splitStringRed(char *string, int *cmdCountRed) { //legal fazer isso só antes da execução!
+    char delim ='>';
+    *cmdCountRed =1;
+    char **array = malloc(*cmdCountRed * sizeof(char *)); //criar dinamicamente array
     array[0] = &string[0]; //armazena no array a posicao de cada comando
     for (int i = 1; string[i] != 0; i++) {
         if (string[i] == delim) {
-            (*cmdCountPipe)++;
-            array = realloc(array, sizeof(char *) * (*cmdCountPipe));
-            array[(*cmdCountPipe) - 1] = &string[i + 1];
+            (*cmdCountRed)++;
+            array = realloc(array, sizeof(char *) * (*cmdCountRed));
+            array[(*cmdCountRed) - 1] = &string[i + 1];
             string[i] = 0;
-            cmd_total_pipe++;
+            cmd_total_red++;
         }
-          printf("array[i]: %s %i\n",*array,i);
+          //printf("array[i]: %s %i\n",*array,i);
     }
+    printf("array[0]: %s \n",array[0]);
+    printf("array[1]: %s \n",array[1]);
     return array;
 }
-
 
 int *styleCheck(char *input){ //tbm cmd vazio!!
     int count=0;
@@ -163,7 +169,7 @@ int execvpSeq(char *cmds[]){
     }
 }
 
-//PROCESSO DEFUNTO!!! RESOLVER - RESOLVIDO
+//PROCESSO DEFUNTO!!! - RESOLVIDO
 int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
     int pipefd[2];
 
@@ -212,8 +218,45 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
     waitpid(pid1,NULL,0);
     waitpid(pid2,NULL,0);
     return 0;
-    //DESCOBRIR COMO USAR DUP2()!! para pegar a saida de um!
 }
+
+int execvpSeqRed(char *cmds[],char *arq){
+    arqRed=fopen(arq,"r+");
+
+    int pipefd[2];
+
+    /* create the pipe */
+    if (pipe(pipefd) == -1) {
+        fprintf(stderr,"Pipe failed");
+        return 1;
+    }
+
+    /* fork a child process */
+    int pid1 = fork();
+    if(pid1 < 0){ /* error occured */
+        fprintf(stderr, "Comando falhou! Fork failed!");
+        return 2;
+    }
+
+    if(pid1==0){                 // USAR ESSE COMANDO\/
+        dup2(pipefd[1],arqRed); //Write process https://www.youtube.com/watch?v=5fnVr-zH-SE
+        close(pipefd[0]);
+        close(pipefd[1]); //we dont use this
+        //execlp("ping","ping","-c", "5","google.com",NULL); //com esse teste funciona!!
+        execvp(cmds[0],cmds);
+    }
+
+    //fechar os handles do processo pai
+    close(pipefd[0]);
+    close(pipefd[1]);
+
+//posso fazer um for aqui!
+    waitpid(pid1,NULL,0);
+    fclose(arqRed);
+
+    return 0;
+}
+
 
 char *execvpPar(Argv_ParStruct *Argv_par){
     // splitar cada Argv_par->cmds[execvpPar_count] em um cmd e args e chamar a execução!!
@@ -346,7 +389,7 @@ int main(int argc, char* argv[]) {
                     for (int j = 0; j <= cmd_args_count; ++j) {
                         //if para verificar se tem | - pipe!!
                         printf("cmdsArray[i] %s\n",cmdsArray[i]);
-                        if(strstr(cmdsArray[i],"|")==NULL){
+                        if(strstr(cmdsArray[i],"|")==NULL && strstr(cmdsArray[i]," > ")==NULL){
                             char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
                             txt = strtok(cmdsArray[i], " ");
                             int k = 0;
@@ -359,10 +402,38 @@ int main(int argc, char* argv[]) {
 
                             //sequencial!!
                             //printf("last: %s\n",lastCmd);
-                            if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i],"|")==NULL) {
+                            if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i],"|")==NULL && strstr(cmdsArray[i]," > ")==NULL) {
                                 //forkar para que o execvp nao encerre o processo atual:
                                 execvpSeq(argv);
                             }//fim Sequencial!!
+                        }else if(strstr(cmdsArray[i]," > ")!=NULL){
+                            char **cmdsArrayRed = splitStringRed(cmdsArray[i], &cmd_count_red);
+
+                            //separar os cmd do args
+                            char *txt;
+                            txt = strtok(cmdsArrayRed[0], " ");
+                            int k = 0;
+                            while (txt != NULL) {
+                                argv_Red[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+
+                            argv_Red[k] = NULL;
+
+                            //corrigir espacamento do file de saida!
+                            char *txt2;
+                            txt2 = strtok(cmdsArrayRed[1], " ");
+                            k = 0;
+                            while (txt2 != NULL) {
+                                argv_Red2[k] = txt2;
+                                txt2 = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_Red2[k] = NULL;
+
+                            execvpSeqRed(argv_Red,argv_Red2[0]);
+                            //executar como no PIPE e salvar no arquivo escrito!!
 
                         }else{
                             /*
@@ -391,8 +462,8 @@ int main(int argc, char* argv[]) {
                             }
                             argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
                             printf("argv_pipe[0]: %s\n",argv_pipe[0]);
-                            //para o pai
 
+                            //para o pai
                             char *txt2;
                             txt2 = strtok(cmdsArrayPipe[1], " ");
                             k = 0;

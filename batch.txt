@@ -1,5 +1,6 @@
 echo 123; echo 312; date; ps; ls
 ps
+date > datefile; echo 123
 style parallel
 ps; echo 123; ls -l | sort -k 5
 style sequential
