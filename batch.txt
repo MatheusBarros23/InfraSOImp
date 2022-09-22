@@ -1,7 +1,6 @@
 echo 123; echo 312; date; ps; ls
-date
-echo 123; ps; echo 321
-ls -la | sort -k 5; echo 213
-ps; echo 321; ls
+ps
 style parallel
-echo 123; echo 312; date; ps; ls
+ps; echo 123; ls -l | sort -k 5
+style sequential
+echo 123; ls

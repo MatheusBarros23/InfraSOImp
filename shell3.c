@@ -38,6 +38,7 @@ char *argv_p[MAX_LINE/2+1];
 char *argv_pipe[MAX_LINE/2+1];
 char *argv_pipe2[MAX_LINE/2+1];
 char *read_msg;
+int h=0; //para contar linhas
 
 
 //lokar o contador para não dar prob quando passar as strings!!
@@ -72,7 +73,7 @@ char **splitString(char *string, int *cmdCount) {
             string[i] = 0;
             cmd_total++;
         }
-      //  printf("array[i]: %s %i\n",*array,i);
+        //  printf("array[i]: %s %i\n",*array,i);
     }
     return array;
 }
@@ -92,6 +93,24 @@ char **splitStringPipe(char *string, int *cmdCountPipe) { //legal fazer isso só
             cmd_total_pipe++;
         }
         //  printf("array[i]: %s %i\n",*array,i);
+    }
+    return array;
+}
+
+char **splitStringRed(char *string, int *cmdCountPipe) { //legal fazer isso só antes da execução!
+    char delim ='>'; //vao se 3: > < e >>
+    *cmdCountPipe =1;
+    char **array = malloc(*cmdCountPipe * sizeof(char *)); //criar dinamicamente array
+    array[0] = &string[0]; //armazena no array a posicao de cada comando
+    for (int i = 1; string[i] != 0; i++) {
+        if (string[i] == delim) {
+            (*cmdCountPipe)++;
+            array = realloc(array, sizeof(char *) * (*cmdCountPipe));
+            array[(*cmdCountPipe) - 1] = &string[i + 1];
+            string[i] = 0;
+            cmd_total_pipe++;
+        }
+          printf("array[i]: %s %i\n",*array,i);
     }
     return array;
 }
@@ -143,7 +162,8 @@ int execvpSeq(char *cmds[]){
         wait(NULL);
     }
 }
-//PROCESSO DEFUNTO!!! RESOLVER
+
+//PROCESSO DEFUNTO!!! RESOLVER - RESOLVIDO
 int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
     int pipefd[2];
 
@@ -195,11 +215,6 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
     //DESCOBRIR COMO USAR DUP2()!! para pegar a saida de um!
 }
 
-/*
-    Tenho que separar o que cada processo vai alterar! De modo que as alterações de uma thread não
-    impliquem em alterações nas outras!
-        Acessam o mesmo espaço de memória. Que está sendo modificado. \/ MUTEX LOCK resolveu isso!
-*/
 char *execvpPar(Argv_ParStruct *Argv_par){
     // splitar cada Argv_par->cmds[execvpPar_count] em um cmd e args e chamar a execução!!
     if(strstr(Argv_par->cmds[execvpPar_count],"|")!=NULL){
@@ -207,7 +222,7 @@ char *execvpPar(Argv_ParStruct *Argv_par){
         char **cmdsArrayPipe = splitStringPipe(Argv_par->cmds[execvpPar_count], &cmd_count_pipe);
 
         for (int i = 0; i <= cmd_count; ++i) {
-          //  printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
+            //  printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
             //splitar o cmd dos args!!
         }
         //para o child
@@ -221,7 +236,7 @@ char *execvpPar(Argv_ParStruct *Argv_par){
             k++;
         }
         argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
-      //  printf("argv_pipe[0]: %s\n",argv_pipe[0]);
+        //  printf("argv_pipe[0]: %s\n",argv_pipe[0]);
         //para o pai
 
         char *txt2;
@@ -234,7 +249,7 @@ char *execvpPar(Argv_ParStruct *Argv_par){
             k++;
         }
         argv_pipe2[k] = 0; //ultima para NULL, necessidade do execvp
-      //  printf("argv_pipe[1]: %s\n",argv_pipe[1]);
+        //  printf("argv_pipe[1]: %s\n",argv_pipe[1]);
         //esta tudo aqui!!
         pthread_mutex_lock(&lock); //começo o lock
         execvpPar_count++; //var estava dando prob pq era incrementada pelas threads que chegava antes, entao solução foi lockar para cada 1 acessar
@@ -257,7 +272,7 @@ char *execvpPar(Argv_ParStruct *Argv_par){
         execvpPar_count++; //var estava dando prob pq era incrementada pelas threads que chegava antes, entao solução foi lockar para cada 1 acessar
         pthread_mutex_unlock(&lock);//termino o lock
         //return argv_p;
-       // printf("argv_p NO PIPE: %s\n",argv_p[0]);
+        // printf("argv_p NO PIPE: %s\n",argv_p[0]);
         execvpSeq(argv_p); //posso tentar execuatar por aqui mesmo! evitar algum prob
     }
 }
@@ -306,7 +321,7 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-           // printf("LETRA: [%d]",cmd[0]);
+            // printf("LETRA: [%d]",cmd[0]);
 
             //verificar mudança de estilo!
             styleCheck(cmd);
@@ -314,14 +329,14 @@ int main(int argc, char* argv[]) {
             //Splittar os Comandos pela ;
             char **cmdsArray = splitString(cmd, &cmd_count);
 
-          /*  for (int i = 0; i <= cmd_total; ++i) {
-                 printf("CMDSARRAY: %s\n",cmdsArray[i]);
-                 if(strstr(cmdsArray[i],"|")==NULL){
-                     printf("NAO TEM PIPE\n");
-                 }else{
-                     printf("TEM PIPE\n");
-                 }
-            }*/
+            /*  for (int i = 0; i <= cmd_total; ++i) {
+                   printf("CMDSARRAY: %s\n",cmdsArray[i]);
+                   if(strstr(cmdsArray[i],"|")==NULL){
+                       printf("NAO TEM PIPE\n");
+                   }else{
+                       printf("TEM PIPE\n");
+                   }
+              }*/
 
 //Executar os comandos!!
             //printf("CMDTOTAL: %d\n",cmd_total);
@@ -329,8 +344,8 @@ int main(int argc, char* argv[]) {
                 for (int i = 0; i <= cmd_total; ++i) {
                     //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL) - per space!!
                     for (int j = 0; j <= cmd_args_count; ++j) {
-                       //if para verificar se tem | - pipe!!
-                       printf("cmdsArray[i] %s\n",cmdsArray[i]);
+                        //if para verificar se tem | - pipe!!
+                        printf("cmdsArray[i] %s\n",cmdsArray[i]);
                         if(strstr(cmdsArray[i],"|")==NULL){
                             char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
                             txt = strtok(cmdsArray[i], " ");
@@ -361,10 +376,10 @@ int main(int argc, char* argv[]) {
                             char **cmdsArrayPipe = splitStringPipe(cmdsArray[i], &cmd_count_pipe);
 
                             for (int i = 0; i <= cmd_count; ++i) {
-                               printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
-                            //splitar o cmd dos args!!
+                                printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
+                                //splitar o cmd dos args!!
                             }
-                    //para o child
+                            //para o child
                             char *txt;
                             txt = strtok(cmdsArrayPipe[0], " ");
                             int k = 0;
@@ -376,7 +391,7 @@ int main(int argc, char* argv[]) {
                             }
                             argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
                             printf("argv_pipe[0]: %s\n",argv_pipe[0]);
-                    //para o pai
+                            //para o pai
 
                             char *txt2;
                             txt2 = strtok(cmdsArrayPipe[1], " ");
@@ -426,7 +441,7 @@ int main(int argc, char* argv[]) {
 
                 //testando criacao das threads!!
                 for (int i = 0; i < cmd_count; ++i) {
-                   // printf("cmd_count: %d\n",cmd_count);
+                    // printf("cmd_count: %d\n",cmd_count);
                     t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
                     if(t1[i])
                     {
@@ -434,7 +449,7 @@ int main(int argc, char* argv[]) {
                         exit(EXIT_FAILURE);//eroor
                     }
                     // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
-              //      printf("t1[%d]: %d\n",i,t1[i]);
+                    //      printf("t1[%d]: %d\n",i,t1[i]);
                 }
 
                 /* Wait till threads are complete before main continues. */
@@ -463,7 +478,7 @@ int main(int argc, char* argv[]) {
             char *cmdString = malloc(MAX_LINE * sizeof(char *)); //criar dinamicamente array
             char c, letra='\n';
             char line[256];
-            int linhas=1;
+            int linhas=0;
             pnt=fopen(argv[1],"r");
             //Lendo o arquivo 1 por 1
             while(fread (&c, sizeof(char), 1, pnt)) {
@@ -473,152 +488,155 @@ int main(int argc, char* argv[]) {
             }
             fclose(pnt);
 
-            int h=0;
             pnt=fopen(argv[1],"r");
             while (fscanf(pnt, "%[^\n] ", cmdString) != EOF ){
                 h++;
-                //podia aqui usar um realoc, talvez fosse melhor! Mas esta funcionando o/
-                cmdString[strlen(cmdString) - 1] = 0; // ISSO RESOLVEU (pq tira o ultimo!!)
-               // printf("%ld\n", strlen(cmdString));
-                printf("> [%s]\n", cmdString);
+                if(h+1>linhas+1){
+                    exit(0);
+                }
+                //cmdString[strlen(cmdString) - 1] = 0; // ISSO RESOLVEU (pq tira o ultimo!!) /MAS GERA PROB NA ULTIMA LINHA!!
+                // printf("%ld\n", strlen(cmdString));
+                //printf("> [%s]\n", cmdString);
 
-            if(h==linhas+1){ //USAR ISSO PARA SAIDA ARQ SEM EXIT! E ARRUMAR BUG ULTIMA LINHA!
+     //ARRUMAR ESSE LIXOO!! gerado - PEGAR QTD LINHAS E DEPOIS TERMINAR!!
+                printf("\tcmdString: %s\n",cmdString);
 
-                exit(0);
-            }
-            //LIMPAR A STRING!!
-            styleCheck(cmdString);
+                cmdString[strlen(cmdString) -1] =0; //posso concatenar com exit! para resolver!
 
-            char **cmdsArray = splitString(cmdString, &cmd_count);
-            for (int i = 0; i <= cmd_total ; ++i) {
-                printf("CMDSARRAY: %s\n",cmdsArray[i]);
-            }
+                //LIMPAR A STRING!!
+                styleCheck(cmdString);
 
-            //Corrigir erro quando não consegue abrir o arq!!
+                char **cmdsArray = malloc(*cmdString * sizeof(char *));
+                cmdsArray = splitString(cmdString, &cmd_count);
 
-            // executar quando sequencial:
-            if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!") && strstr(cmdString, "style")==NULL) {
-                if(strstr(cmdString,"exi")!=NULL){
-                    kill(0,9);
+                for (int i = 0; i <= cmd_total ; ++i) {
+                    printf("CMDSARRAY: %s\n",cmdsArray[i]);
                 }
 
-                for (int i = 0; i <= cmd_total; ++i) {
-                    //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
-                    for (int j = 0; j <= cmd_args_count; ++j) {
-                      if(strstr(cmdsArray[i],"|")==NULL){
-                        char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
-                        txt = strtok(cmdsArray[i], " ");
-                        int k = 0;
-                        while (txt != NULL) {
-                            argv[k] = txt;
-                            txt = strtok(NULL, " ");
-                            k++;
-                        }
-                        argv[k] = NULL; //ultima para NULL, necessidade do execvp
+                //Corrigir erro quando não consegue abrir o arq!
 
-                        //sequencial!!
-                        //printf("last: %s\n",lastCmd);
-                        if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i], "|") == NULL) {
-                            //forkar para que o execvp nao encerre o processo atual:
-                            execvpSeq(argv);
-                        }
-                    }else{
-                          char **cmdsArrayPipe = splitStringPipe(cmdsArray[i], &cmd_count_pipe);
-
-                          for (int i = 0; i <= cmd_count; ++i) {
-                             // printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
-                              //splitar o cmd dos args!!
-                          }
-                          //para o child
-                          char *txt;
-                          txt = strtok(cmdsArrayPipe[0], " ");
-                          int k = 0;
-
-                          while (txt != NULL) {
-                              argv_pipe[k] = txt;
-                              txt = strtok(NULL, " ");
-                              k++;
-                          }
-                          argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
-                         // printf("argv_pipe[0]: %s\n",argv_pipe[0]);
-                          //para o pai
-
-                          char *txt2;
-                          txt2 = strtok(cmdsArrayPipe[1], " ");
-                          k = 0;
-
-                          while (txt2 != NULL) {
-                              argv_pipe2[k] = txt2;
-                              txt2 = strtok(NULL, " ");
-                              k++;
-                          }
-                          argv_pipe2[k] = 0; //ultima para NULL, necessidade do execvp
-
-                          //esta tudo aqui!!
-                          execvpSeqPipe(argv_pipe,argv_pipe2);
-                      }
+                // executar quando sequencial:
+                if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!") && strstr(cmdString, "style")==NULL) {
+                    if(strstr(cmdString,"exi")!=NULL){
+                        kill(0,9);
                     }
-                }//fim do for sequencial!!
+
+                    for (int i = 0; i <= cmd_total; ++i) {
+                        //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
+                        for (int j = 0; j <= cmd_args_count; ++j) {
+                            if(strstr(cmdsArray[i],"|")==NULL){
+                                char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
+                                txt = strtok(cmdsArray[i], " ");
+                                int k = 0;
+                                while (txt != NULL) {
+                                    argv[k] = txt;
+                                    txt = strtok(NULL, " ");
+                                    k++;
+                                }
+                                argv[k] = NULL; //ultima para NULL, necessidade do execvp
+
+                                //sequencial!!
+                                //printf("last: %s\n",lastCmd);
+                                if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i], "|") == NULL) {
+                                    //forkar para que o execvp nao encerre o processo atual:
+                                    execvpSeq(argv);
+                                }
+                            }else{
+                                char **cmdsArrayPipe = splitStringPipe(cmdsArray[i], &cmd_count_pipe);
+
+                                for (int i = 0; i <= cmd_count; ++i) {
+                                    // printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
+                                    //splitar o cmd dos args!!
+                                }
+                                //para o child
+                                char *txt;
+                                txt = strtok(cmdsArrayPipe[0], " ");
+                                int k = 0;
+
+                                while (txt != NULL) {
+                                    argv_pipe[k] = txt;
+                                    txt = strtok(NULL, " ");
+                                    k++;
+                                }
+                                argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
+                                // printf("argv_pipe[0]: %s\n",argv_pipe[0]);
+                                //para o pai
+
+                                char *txt2;
+                                txt2 = strtok(cmdsArrayPipe[1], " ");
+                                k = 0;
+
+                                while (txt2 != NULL) {
+                                    argv_pipe2[k] = txt2;
+                                    txt2 = strtok(NULL, " ");
+                                    k++;
+                                }
+                                argv_pipe2[k] = 0; //ultima para NULL, necessidade do execvp
+
+                                //esta tudo aqui!!
+                                execvpSeqPipe(argv_pipe,argv_pipe2);
+                            }
+                        }
+                    }//fim do for sequencial!!
+                    cmd_args_count=0;
+                    cmd_total=0;
+                    histVerify=0;
+                }
+                    //fim sequencial
+                    //executar paralelo
+                else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
+                      printf("AGORA PARALLELO: %s\n",argv[0]);
+
+                    //inicializando a struct para armazenar os dados! Conforme o tamanho
+
+                    Argv_ParStruct argvPar = {cmd_total};
+
+                    for (int l = 0; l < cmd_count; ++l) {
+                        argvPar.cmds[l] = cmdsArray[l];
+                    }
+
+                    //for para analisar o struct criado!!
+                    for (int l = 0; l < cmd_count; ++l) {
+                        //     printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
+                    }
+                    //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
+                    //execução dos COMANDOS!! (Max. 2);
+                    pthread_t thread1[cmd_count];
+                    int  t1[cmd_count];
+
+                    //separar aqui e depois passar tudo certinho para as thread!! já dividido!!
+
+                    // char *cmdArgvPar = execvpParSep(&argvPar);
+                    // printf("cmdArgvPar: %s\n",argvPar.cmds[0]); //ver issooooooo!!
+
+
+                    //testando criacao das threads!!
+                    for (int i = 0; i < cmd_count; ++i) {
+                        // printf("cmd_count: %d\n",cmd_count);
+                        t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
+                        if(t1[i])
+                        {
+                            fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
+                            exit(EXIT_FAILURE);//eroor
+                        }
+                        // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
+                    }
+                    /* Wait till threads are complete before main continues. */
+                    //FOR usado para juntar todos as threads criadas, de modo a esperar o wait da main!
+                    for (int i = 0; i < cmd_count; ++i) {
+                        if(pthread_join(thread1[i], NULL)!=0){
+                            return 2;
+                        }
+                        //printf("Thread %d FINISHED\n",i);
+                        if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
+                            execvpPar_count=0;
+                        }
+                    }
+                }
                 cmd_args_count=0;
                 cmd_total=0;
                 histVerify=0;
             }
-                //fim sequencial
-                //executar paralelo
-            else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
-                //  printf("AGORA PARALLELO: %s\n",argv[0]);
-
-                //inicializando a struct para armazenar os dados! Conforme o tamanho
-
-                Argv_ParStruct argvPar = {cmd_total};
-
-                for (int l = 0; l < cmd_count; ++l) {
-                    argvPar.cmds[l] = cmdsArray[l];
-                }
-
-                //for para analisar o struct criado!!
-                for (int l = 0; l < cmd_count; ++l) {
-                //     printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
-                }
-                //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
-                //execução dos COMANDOS!! (Max. 2);
-                pthread_t thread1[cmd_count];
-                int  t1[cmd_count];
-
-                //separar aqui e depois passar tudo certinho para as thread!! já dividido!!
-
-                // char *cmdArgvPar = execvpParSep(&argvPar);
-               // printf("cmdArgvPar: %s\n",argvPar.cmds[0]); //ver issooooooo!!
-
-
-                   //testando criacao das threads!!
-                   for (int i = 0; i < cmd_count; ++i) {
-                       // printf("cmd_count: %d\n",cmd_count);
-                       t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
-                       if(t1[i])
-                       {
-                           fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
-                           exit(EXIT_FAILURE);//eroor
-                       }
-                       // printf("pthread_create() for Thread %d returns: %d\n",i,t1[i]);
-                   }
-                   /* Wait till threads are complete before main continues. */
-                   //FOR usado para juntar todos as threads criadas, de modo a esperar o wait da main!
-                   for (int i = 0; i < cmd_count; ++i) {
-                       if(pthread_join(thread1[i], NULL)!=0){
-                           return 2;
-                       }
-                       //printf("Thread %d FINISHED\n",i);
-                       if(execvpPar_count>i){ //zerar para não gerar prob com outros loops
-                           execvpPar_count=0;
-                       }
-                   }
-
-            }
-                cmd_args_count=0;
-                cmd_total=0;
-                histVerify=0;
-        }
             fclose(pnt);
             //FIM PARALLELO
             //condição de saida quando não consigo abrir aqr!
@@ -631,20 +649,19 @@ int main(int argc, char* argv[]) {
             exit(0);
         }
     }
-
     return 0;
 }
 
 
-
-//TRATAR ERRO BATCH!! - sem exit
+//TRATAR ERRO BATCH!! - QUANDO TEM ULTIMA FILA!! -- PROBLEMA EXISTE QUANDO USO O PARALLEL // HORRIVEL!! RECORRIGIR!!
 //REDIRECT >
 //BACKGROUND &
+
 
 /* int len = sizeof(*argv)/sizeof(argv[0]);
             for (int l = 0; l <= len ; ++l) {
                 lastCmd[l] = argv[l];
             }
-            */
+*/
 
 // PRECISO COLOCAR UM CHECK DO STYLE ANTES DE CADA EXECUÃO!!
