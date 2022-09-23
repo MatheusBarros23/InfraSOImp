@@ -462,13 +462,7 @@ int main(int argc, char* argv[]) {
                             //executar como no PIPE e salvar no arquivo escrito!!
 
                         }else{
-                            /*
-                             Situação:
-                                Tenho as 2 linhas separadas! em um array
-                                O que preciso fazer é mandar o cmd + args do 1 para o child e
-                                                               cmd + args do 2 para o pai!
-                                                   Poderia fazer uma struct? Acho que seria mais tranquilo assim!
-                             */
+
                             //preciso separar novamnente pelo | pipe
                             char **cmdsArrayPipe = splitStringPipe(cmdsArray[i], &cmd_count_pipe);
 
@@ -621,7 +615,7 @@ int main(int argc, char* argv[]) {
                     for (int i = 0; i <= cmd_total; ++i) {
                         //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL)
                         for (int j = 0; j <= cmd_args_count; ++j) {
-                            if(strstr(cmdsArray[i],"|")==NULL){
+                            if(strstr(cmdsArray[i],"|")==NULL && strstr(cmdsArray[i]," > ")==NULL){
                                 char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
                                 txt = strtok(cmdsArray[i], " ");
                                 int k = 0;
@@ -634,11 +628,40 @@ int main(int argc, char* argv[]) {
 
                                 //sequencial!!
                                 //printf("last: %s\n",lastCmd);
-                                if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i], "|") == NULL) {
+                                if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i], "|") == NULL && strstr(cmdsArray[i]," > ")==NULL) {
                                     //forkar para que o execvp nao encerre o processo atual:
                                     execvpSeq(argv);
                                 }
-                            }else{
+                            }
+                            else if(strstr(cmdsArray[i]," > ")!=NULL){
+                                char **cmdsArrayRed = splitStringRed(cmdsArray[i], &cmd_count_red);
+
+                                char *txt;
+                                txt = strtok(cmdsArrayRed[0], " ");
+                                int k = 0;
+                                while (txt != NULL) {
+                                    argv_Red[k] = txt;
+                                    txt = strtok(NULL, " ");
+                                    k++;
+                                }
+
+                                argv_Red[k] = NULL;
+
+                                //corrigir espacamento do file de saida!
+                                char *txt2;
+                                txt2 = strtok(cmdsArrayRed[1], " ");
+                                k = 0;
+                                while (txt2 != NULL) {
+                                    argv_Red2[k] = txt2;
+                                    txt2 = strtok(NULL, " ");
+                                    k++;
+                                }
+                                argv_Red2[k] = NULL;
+
+                                execvpSeqRed(argv_Red,argv_Red2[0]);
+
+                            }
+                            else{
                                 char **cmdsArrayPipe = splitStringPipe(cmdsArray[i], &cmd_count_pipe);
 
                                 for (int i = 0; i <= cmd_count; ++i) {
