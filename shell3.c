@@ -7,6 +7,9 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <pthread.h>
+#include <fcntl.h>
+
+
 
 
 #define MAX_LINE 200 /* 80 chars per line, per command */
@@ -117,8 +120,8 @@ char **splitStringRed(char *string, int *cmdCountRed) { //legal fazer isso só a
         }
           //printf("array[i]: %s %i\n",*array,i);
     }
-    printf("array[0]: %s \n",array[0]);
-    printf("array[1]: %s \n",array[1]);
+    //printf("array[0]: %s \n",array[0]);
+   // printf("array[1]: %s \n",array[1]);
     return array;
 }
 
@@ -221,15 +224,6 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
 }
 
 int execvpSeqRed(char *cmds[],char *arq){
-    arqRed=fopen(arq,"r+");
-
-    int pipefd[2];
-
-    /* create the pipe */
-    if (pipe(pipefd) == -1) {
-        fprintf(stderr,"Pipe failed");
-        return 1;
-    }
 
     /* fork a child process */
     int pid1 = fork();
@@ -239,20 +233,22 @@ int execvpSeqRed(char *cmds[],char *arq){
     }
 
     if(pid1==0){                 // USAR ESSE COMANDO\/
-        dup2(pipefd[1],arqRed); //Write process https://www.youtube.com/watch?v=5fnVr-zH-SE
-        close(pipefd[0]);
-        close(pipefd[1]); //we dont use this
+        int fileRed = open(arq,O_WRONLY | O_CREAT, 0777); //abrir o arq, ou cria-lo!
+        if(fileRed==-1){
+            printf("Error creating the file\n");
+        }
+
+        /*Alterar o 1(stdout) para o arq que iremos criar!*/
+        dup2(fileRed, STDOUT_FILENO); //duplica o fd do fileRed! e substitui a saida para o file!!
+        close(fileRed);
         //execlp("ping","ping","-c", "5","google.com",NULL); //com esse teste funciona!!
         execvp(cmds[0],cmds);
     }
 
-    //fechar os handles do processo pai
-    close(pipefd[0]);
-    close(pipefd[1]);
-
 //posso fazer um for aqui!
     waitpid(pid1,NULL,0);
-    fclose(arqRed);
+    printf("Command's ""%s"" output saved in %s\n", cmds[0], arq);
+
 
     return 0;
 }
@@ -298,6 +294,36 @@ char *execvpPar(Argv_ParStruct *Argv_par){
         execvpPar_count++; //var estava dando prob pq era incrementada pelas threads que chegava antes, entao solução foi lockar para cada 1 acessar
         pthread_mutex_unlock(&lock);//termino o lock
         execvpSeqPipe(argv_pipe,argv_pipe2);
+    }
+    else if(strstr(Argv_par->cmds[execvpPar_count]," > ")!=NULL){
+        char **cmdsArrayRed = splitStringRed(Argv_par->cmds[execvpPar_count], &cmd_count_pipe);
+        char *txt;
+        txt = strtok(cmdsArrayRed[0], " ");
+        int k = 0;
+        while (txt != NULL) {
+            argv_Red[k] = txt;
+            txt = strtok(NULL, " ");
+            k++;
+        }
+
+        argv_Red[k] = NULL;
+
+        //corrigir espacamento do file de saida!
+        char *txt2;
+        txt2 = strtok(cmdsArrayRed[1], " ");
+        k = 0;
+        while (txt2 != NULL) {
+            argv_Red2[k] = txt2;
+            txt2 = strtok(NULL, " ");
+            k++;
+        }
+        argv_Red2[k] = NULL;
+
+        pthread_mutex_lock(&lock); //começo o lock
+        execvpPar_count++;
+        pthread_mutex_unlock(&lock);//termino o lock
+
+        execvpSeqRed(argv_Red,argv_Red2[0]);
     }
     else {
         char *txt;
@@ -388,7 +414,7 @@ int main(int argc, char* argv[]) {
                     //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL) - per space!!
                     for (int j = 0; j <= cmd_args_count; ++j) {
                         //if para verificar se tem | - pipe!!
-                        printf("cmdsArray[i] %s\n",cmdsArray[i]);
+                      //  printf("cmdsArray[i] %s\n",cmdsArray[i]);
                         if(strstr(cmdsArray[i],"|")==NULL && strstr(cmdsArray[i]," > ")==NULL){
                             char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
                             txt = strtok(cmdsArray[i], " ");
@@ -581,7 +607,7 @@ int main(int argc, char* argv[]) {
                 cmdsArray = splitString(cmdString, &cmd_count);
 
                 for (int i = 0; i <= cmd_total ; ++i) {
-                    printf("CMDSARRAY: %s\n",cmdsArray[i]);
+                  //  printf("CMDSARRAY: %s\n",cmdsArray[i]);
                 }
 
                 //Corrigir erro quando não consegue abrir o arq!
