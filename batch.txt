@@ -5,4 +5,6 @@ style parallel
 ps; echo 123; ls -l | sort -k 5
 date > datefile2; echo 312
 style sequential
+./a.out < inputfile.txt
 echo 123; ls
+exit
