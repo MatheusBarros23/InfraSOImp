@@ -9,10 +9,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Interative - Sequential - DONE&#10;Interative - Parallel - DONE&#10;Batch - Sequential - DONE&#10;Batch - Parallel - Done">
+    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Add simple &quot; &gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential -&#10;Batch - Parallel -">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/a.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/batch.txt" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/batch.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/shell3.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell3.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -91,7 +91,7 @@
       <workItem from="1663797284346" duration="1186000" />
       <workItem from="1663808711707" duration="1242000" />
       <workItem from="1663893294867" duration="479000" />
-      <workItem from="1663958281338" duration="3656000" />
+      <workItem from="1663958281338" duration="4109000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -212,7 +212,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663720385192</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Add simple &quot; &gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential -&#10;Batch - Parallel -">
+      <created>1663964646984</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1663964646984</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -278,6 +285,7 @@
     <MESSAGE value="Start Pipe implementation:&#10;Sequential Behavior" />
     <MESSAGE value="Start Pipe implementation:&#10;Sequential Behavior: Need pipe study" />
     <MESSAGE value="Interative - Sequential - DONE&#10;Interative - Parallel - DONE&#10;Batch - Sequential - DONE&#10;Batch - Parallel - Done" />
-    <option name="LAST_COMMIT_MESSAGE" value="Interative - Sequential - DONE&#10;Interative - Parallel - DONE&#10;Batch - Sequential - DONE&#10;Batch - Parallel - Done" />
+    <MESSAGE value="Add simple &quot; &gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential -&#10;Batch - Parallel -" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add simple &quot; &gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential -&#10;Batch - Parallel -" />
   </component>
 </project>
