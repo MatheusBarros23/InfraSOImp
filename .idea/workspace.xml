@@ -9,12 +9,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Add Output &quot; &gt;&gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - &#10;Batch - Sequential - &#10;Batch - Parallel -">
-      <change afterPath="$PROJECT_DIR$/InfraSOImp/file2.txt" afterDir="false" />
+    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Add Output &quot; &gt;&gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential - DONE&#10;Batch - Parallel - DONE&#10;&#10;AND: Verify file existence!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/a.out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp/asdads" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/batch2.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp/batch.txt" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/batch.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/shell3.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell3.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -94,7 +92,7 @@
       <workItem from="1663808711707" duration="1242000" />
       <workItem from="1663893294867" duration="479000" />
       <workItem from="1663958281338" duration="11495000" />
-      <workItem from="1664022595221" duration="12523000" />
+      <workItem from="1664022595221" duration="17192000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -250,7 +248,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664035764776</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Add Output &quot; &gt;&gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential - DONE&#10;Batch - Parallel - DONE&#10;&#10;AND: Verify file existence!">
+      <created>1664039490967</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1664039490967</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -321,6 +326,7 @@
     <MESSAGE value="Add input &quot; &lt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - &#10;Batch - Sequential - DONE (nao volta pro mesmo)&#10;Batch - Parallel -" />
     <MESSAGE value="Add input &quot; &lt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - &#10;Batch - Sequential - DONE (nao volta pro mesmo)&#10;Batch - Parallel - DONE" />
     <MESSAGE value="Add Output &quot; &gt;&gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - &#10;Batch - Sequential - &#10;Batch - Parallel -" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Output &quot; &gt;&gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - &#10;Batch - Sequential - &#10;Batch - Parallel -" />
+    <MESSAGE value="Add Output &quot; &gt;&gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential - DONE&#10;Batch - Parallel - DONE&#10;&#10;AND: Verify file existence!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Output &quot; &gt;&gt; &quot; Redirect:&#10;Interative - sequential - DONE&#10;Interative - parallel - DONE&#10;Batch - Sequential - DONE&#10;Batch - Parallel - DONE&#10;&#10;AND: Verify file existence!" />
   </component>
 </project>
