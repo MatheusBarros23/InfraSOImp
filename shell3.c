@@ -38,7 +38,7 @@ int cmd_args_count=0;
 char *cmd_clean[MAX_LINE];
 int execWorked=0;
 int batchCheck=0;
-char *lastCmd[MAX_LINE]={};
+char *lastCmd[MAX_LINE/2+1];
 int histVerify=0;
 int exitCheck =0;
 int should_run = 1;        /* flag to help exit program*/
@@ -55,6 +55,7 @@ char *argv_RedOut[MAX_LINE/2+1];
 char *argv_RedOut2[MAX_LINE/2+1];
 char *read_msg;
 int h=0; //para contar linhas
+int retNoCmd;
 
 
 //lokar o contador para não dar prob quando passar as strings!!
@@ -85,6 +86,8 @@ typedef struct
     int size;
     char* cmds[MAX_LINE/2+1];
 }Argv_RedOutStruct;
+
+
 
 
 //splitar a string!! Tentar ver por strtok
@@ -225,7 +228,7 @@ int execvpSeq(char *cmds[]){
     }
     else if(pid == 0){ /* child process */
         pid1 = getpid();
-        if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")!=0&& strcmp(cmds[0], "style")!=0){
+        if(execvp(cmds[0], cmds)<0&& strcmp(cmds[0], "!!")!=0&& strcmp(cmds[0], "style")!=0 && retNoCmd==0){
             fprintf(stderr,"Execvp failed: %s not a Command\n",cmds[0]);
             kill(pid1,9);
             execWorked=0;
@@ -497,6 +500,7 @@ int main(int argc, char* argv[]) {
     int retorno=0;
 
     while (should_run < 2) {
+        retNoCmd=0;
         while (argc==1){
             printf("mprb %s> ", style);
             fflush(stdout);
@@ -504,11 +508,19 @@ int main(int argc, char* argv[]) {
             //pegar o input do usuario e dividir a string
             //user input Keyboard
             fgets(cmd, MAX_LINE, stdin);
-
-            cmd[strlen(cmd) - 1] = 0;
-            fflush(stdout);
-
-            printf("CMD: %s\n",cmd);
+            if(cmd[0]=='\0'){
+                printf("\n");
+                retNoCmd=1;
+                fprintf(stderr,"Error - 'Ctrl + D' not a valid command\n");
+                exit(0);
+            }else if(cmd[0]=='\n'){
+                fprintf(stdout,"No command\n");
+                retNoCmd=1;
+            }else{
+                cmd[strlen(cmd) - 1] = 0;
+                fflush(stdout);
+                retNoCmd=0;
+            }
 
             //verificar Exit:
             if (strcmp(cmd, "exit") == 0) {
@@ -524,16 +536,15 @@ int main(int argc, char* argv[]) {
                 //verificar !! :                //FAZER O HISTORICO!!
             else if (strcmp(cmd, "!!") == 0){
                 if(strcmp(argv[0], "!!") != 0){
-                    //fprintf(stdout, "%s\n",argv[0]);
                     if(strcmp(style,"seq")==0){
                         retorno = execvpSeq(argv);
                     }else if(strcmp(style,"par")==0){
                         retorno = execvpSeq(argv); //arrumar isso!! para aceitar tbm argv no execvpPar
                     }
                     if(retorno>0){
-                    }else{
-                        fprintf(stdout, "No commands\n");
                     }
+                }else{
+                    fprintf(stdout, "No commands\n");
                 }
             }
 
@@ -577,6 +588,7 @@ int main(int argc, char* argv[]) {
                             //sequencial!!
                             //printf("last: %s\n",lastCmd);
                             if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i],"|")==NULL && strstr(cmdsArray[i]," > ")==NULL && strstr(cmdsArray[i]," < ")==NULL && strstr(cmdsArray[i]," >> ")==NULL) {
+                                lastCmd[0]=argv[0];
                                 //forkar para que o execvp nao encerre o processo atual:
                                 execvpSeq(argv);
                             }//fim Sequencial!!
@@ -751,7 +763,7 @@ int main(int argc, char* argv[]) {
             }
 
                 //inicio Paralelo
-            else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
+            else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!") && retNoCmd==0) {
                 //  printf("AGORA PARALLELO: %s\n",argv[0]);
 
                 //inicializando a struct para armazenar os dados! Conforme o tamanho
@@ -820,7 +832,6 @@ int main(int argc, char* argv[]) {
 
             char *cmdString = malloc(MAX_LINE * sizeof(char *)); //criar dinamicamente array
             char c, letra='\n';
-            char line[256];
             int linhas=0;
 
 
@@ -1121,16 +1132,12 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-//Corrigir Input NULL!! CTRL + D
-    //Verificar o !!
+//Verificar o !! (ainda com prob quando < 2)
     //FAZER MAKEFILE!!
 //BACKGROUND &
 
 
-/* int len = sizeof(*argv)/sizeof(argv[0]);
-            for (int l = 0; l <= len ; ++l) {
-                lastCmd[l] = argv[l];
-            }
-*/
-
 // PRECISO COLOCAR UM CHECK DO STYLE ANTES DE CADA EXECUÃO!!
+
+/*Para execução perfeita do batch, é preciso que tenha o exit no final ou, pelo menos, uma linha vazia no final (\n)
+    assim, não foi verificado nenhum erro. na execução do batch file.*/
