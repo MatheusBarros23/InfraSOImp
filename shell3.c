@@ -83,7 +83,6 @@ typedef struct
     char* cmds[MAX_LINE/2+1];
 }Argv_RedOutStruct;
 
-//funcoes
 
 //splitar a string!! Tentar ver por strtok
 char **splitString(char *string, int *cmdCount) {
@@ -299,7 +298,7 @@ int execvpSeqRed(char *cmds[],char *arq){
     }
 
     if(pid1==0){                 // USAR ESSE COMANDO\/
-        int fileRed = open(arq,O_RDWR | O_APPEND | O_CREAT, 0777); //abrir o arq, ou cria-lo!
+        int fileRed = open(arq,O_RDWR | O_APPEND | O_CREAT, 0777); //abrir o arq, appenda-lo ou cria-lo! 0777 (permissoes) - like chmod (octal)
         if(fileRed==-1){
             printf("Error creating the file\n");
         }
@@ -829,7 +828,6 @@ int main(int argc, char* argv[]) {
             char c, letra='\n';
             int linhas=0;
 
-
             fopen(argv[1],"r");
             //Lendo o arquivo 1 por 1
             while(fread (&c, sizeof(char), 1, pnt)) {
@@ -845,14 +843,15 @@ int main(int argc, char* argv[]) {
                 if(h+1>linhas+1){
                  //   exit(0);
                 }
-                //cmdString[strlen(cmdString) - 1] = 0; // ISSO RESOLVEU (pq tira o ultimo!!) /MAS GERA PROB NA ULTIMA LINHA!!
-                // printf("%ld\n", strlen(cmdString));
-                //printf("> [%s]\n", cmdString);
-
-     //ARRUMAR ESSE LIXOO!! gerado - PEGAR QTD LINHAS E DEPOIS TERMINAR!!
-            //    printf("\tcmdString: %s\n",cmdString);
 
                 cmdString[strlen(cmdString) -1] =0; //posso concatenar com exit! para resolver!
+
+                if(strstr(cmdString, "exi")!=NULL){
+                    printf("mprb %s> exit\n", style);
+                }else{
+                    printf("mprb %s> %s\n", style,cmdString);
+                }
+
 
                 //LIMPAR A STRING!!
                 styleCheck(cmdString);
@@ -861,7 +860,7 @@ int main(int argc, char* argv[]) {
                 cmdsArray = splitString(cmdString, &cmd_count);
 
                 for (int i = 0; i <= cmd_total ; ++i) {
-                 //   printf("CMDSARRAY: %s\n",cmdsArray[i]);
+                 //   printf("CMD: %s\n",cmdsArray[i]);
                 }
 
                 //Corrigir erro quando não consegue abrir o arq!
