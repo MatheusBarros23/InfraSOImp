@@ -1,7 +1,9 @@
 echo 123; echo 312; date; ps; ls
 ps
+sort file.txt >> datafile
 date > datefile; echo 123
 style parallel
+sort file2.txt >> datafile3
 ps; echo 123; ls -l | sort -k 5
 date > datefile2; echo 312
 ./a.out < inputfile.txt
