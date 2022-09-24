@@ -1,2 +1,2 @@
-echo euhqiuehqwiuehwqi
+echo uehqwiuehwqi
 ps

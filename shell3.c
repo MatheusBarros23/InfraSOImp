@@ -282,11 +282,6 @@ int execvpSeqRed(char *cmds[],char *arq){
     return 0;
 }
 
-int execvpSeqRedInp(char *cmds[],char *arq) {
-    printf("execvpSeqRedInp - cmds[0]: %s\n",cmds[0]);
-    printf("execvpSeqRedInp - arq: %s\n",arq);
-
-}
 
 char *execvpPar(Argv_ParStruct *Argv_par){
     // splitar cada Argv_par->cmds[execvpPar_count] em um cmd e args e chamar a execução!!
@@ -358,6 +353,46 @@ char *execvpPar(Argv_ParStruct *Argv_par){
         pthread_mutex_unlock(&lock);//termino o lock
 
         execvpSeqRed(argv_Red,argv_Red2[0]);
+    }else if(strstr(Argv_par->cmds[execvpPar_count]," < ")!=NULL){
+        char **cmdsArrayRedInp = splitStringRedInp(Argv_par->cmds[execvpPar_count], &cmd_count_redInp);
+        char *txt;
+        txt = strtok(cmdsArrayRedInp[0], " ");
+        int k = 0;
+        while (txt != NULL) {
+            argv_RedInp[k] = txt;
+            txt = strtok(NULL, " ");
+            k++;
+        }
+
+        argv_RedInp[k] = NULL;
+
+        //corrigir espacamento do file de saida!
+        char *txt2;
+        txt2 = strtok(cmdsArrayRedInp[1], " ");
+        k = 0;
+        while (txt2 != NULL) {
+            argv_RedInp2[k] = txt2;
+            txt2 = strtok(NULL, " ");
+            k++;
+        }
+        argv_RedInp2[k] = NULL;
+
+        Argv_RedInpStruct argvRedInpExec = {3};
+
+      //organizar tudo num struct especifica!
+        argvRedInpExec.cmds[0] = argv_RedInp[0];
+        argvRedInpExec.cmds[1] = argv_RedInp2[0];
+        argvRedInpExec.cmds[2] = NULL;
+
+        printf("argvRedInpExec.cmds[0]: %s\n",argvRedInpExec.cmds[0]);
+        printf("argvRedInpExec.cmds[1]: %s\n",argvRedInpExec.cmds[1]);
+        printf("argvRedInpExec.cmds[2]: %s\n",argvRedInpExec.cmds[2]);
+
+        pthread_mutex_lock(&lock); //começo o lock
+        execvpPar_count++;
+        pthread_mutex_unlock(&lock);//termino o lock
+
+        execvpSeq(argvRedInpExec.cmds);
     }
     else {
         char *txt;
@@ -432,7 +467,7 @@ int main(int argc, char* argv[]) {
             //Splittar os Comandos pela ;
             char **cmdsArray = splitString(cmd, &cmd_count);
 
-              for (int i = 0; i <= cmd_total; ++i) {
+            /*  for (int i = 0; i <= cmd_total; ++i) {
                    printf("CMDSARRAY: %s\n",cmdsArray[i]);
                    if(strstr(cmdsArray[i],"<")!=NULL){
                        printf("TEM REDINP \n");
@@ -440,6 +475,7 @@ int main(int argc, char* argv[]) {
                        printf("TEM PIPE\n");
                    }
               }
+            */
 
 //Executar os comandos!!
             //printf("CMDTOTAL: %d\n",cmd_total);
