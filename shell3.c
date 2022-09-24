@@ -10,11 +10,7 @@
 #include <fcntl.h>
 
 
-
-
 #define MAX_LINE 200 /* 80 chars per line, per command */
-#define READ_END	0
-#define WRITE_END	1
 
 FILE *pnt;
 FILE *arqRed;
@@ -87,8 +83,7 @@ typedef struct
     char* cmds[MAX_LINE/2+1];
 }Argv_RedOutStruct;
 
-
-
+//funcoes
 
 //splitar a string!! Tentar ver por strtok
 char **splitString(char *string, int *cmdCount) {
