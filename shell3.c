@@ -525,7 +525,6 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-
                 //verificar !! :                //FAZER O HISTORICO!!
             else if (strcmp(cmd, "!!") == 0){
                 if(strcmp(argv[0], "!!") != 0){
@@ -541,23 +540,12 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            // printf("LETRA: [%d]",cmd[0]);
-
             //verificar mudança de estilo!
             styleCheck(cmd);
 
             //Splittar os Comandos pela ;
             char **cmdsArray = splitString(cmd, &cmd_count);
 
-            /*  for (int i = 0; i <= cmd_total; ++i) {
-                   printf("CMDSARRAY: %s\n",cmdsArray[i]);
-                   if(strstr(cmdsArray[i],"<")!=NULL){
-                       printf("TEM REDINP \n");
-                   }else{
-                       printf("TEM PIPE\n");
-                   }
-              }
-            */
 
 //Executar os comandos!!
             //printf("CMDTOTAL: %d\n",cmd_total);
@@ -652,10 +640,6 @@ int main(int argc, char* argv[]) {
                             argvRedInpExec.cmds[1] = argv_RedInp2[0];
                             argvRedInpExec.cmds[2] = NULL;
 
-                        //    printf("argvRedInpExec.cmds[0]: %s\n",argvRedInpExec.cmds[0]);
-                        //    printf("argvRedInpExec.cmds[1]: %s\n",argvRedInpExec.cmds[1]);
-                        //    printf("argvRedInpExec.cmds[2]: %s\n",argvRedInpExec.cmds[2]);
-
                             //So falta executar o processo com o arq de input!!
                             execvpSeq(argvRedInpExec.cmds);
 
@@ -704,10 +688,6 @@ int main(int argc, char* argv[]) {
                             argvRedOutExec.cmds[0] = argv_RedOut[0];
                             argvRedOutExec.cmds[1] = argv_RedOut[1];
                             argvRedOutExec.cmds[2] = argv_RedOut2[1];
-
-                            // printf("argvRedOutExec.cmds[0]: %s\n",argvRedOutExec.cmds[0]);
-                            // printf("argvRedOutExec.cmds[1]: %s\n",argvRedOutExec.cmds[1]);
-                            // printf("argvRedOutExec.cmds[2]: %s\n",argvRedOutExec.cmds[2]);
 
                             execvpSeqRed(argvRedOutExec.cmds, argv_RedOut2[0]);
 
@@ -1079,9 +1059,6 @@ int main(int argc, char* argv[]) {
                     int  t1[cmd_count];
 
                     //separar aqui e depois passar tudo certinho para as thread!! já dividido!!
-
-                    // char *cmdArgvPar = execvpParSep(&argvPar);
-                    // printf("cmdArgvPar: %s\n",argvPar.cmds[0]); //ver issooooooo!!
 
                     //testando criacao das threads!!
                     for (int i = 0; i < cmd_count; ++i) {
