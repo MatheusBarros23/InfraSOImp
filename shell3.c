@@ -187,11 +187,11 @@ char **splitStringRedOut(char *string, int *cmdCountRedOut) { //legal fazer isso
 
 int *styleCheck(char *input){ //tbm cmd vazio!!
     int count=0;
-    if(strcmp(input, "style parallel") == 0){
+    if(strstr(input, "style") != NULL &&  strstr(input, "parallel") != NULL){
         printf("[style parallel]\n");
         strcpy(style, "par");
         styleErr=0;
-    }else if (strcmp(input, "style sequential") == 0){
+    }else if (strstr(input, "style") != NULL &&  strstr(input, "sequential") != NULL){
         printf("[style sequential]\n");
         strcpy(style, "seq");
         styleErr=0;
@@ -255,7 +255,7 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
         dup2(pipefd[1],STDOUT_FILENO); //to write
         close(pipefd[0]);
         close(pipefd[1]); //we dont use this
-        //execlp("ping","ping","-c", "5","google.com",NULL); //com esse teste funciona!!
+
         execvp(cmds[0],cmds);
     }
 
@@ -263,7 +263,7 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
     int pid2;
     pid2 = fork();
     if(pid2 < 0){ /* error occured */
-        fprintf(stderr, "Comando falhou! Fork failed! PIPE2");
+        fprintf(stderr, "Comando falhou! Fork failed! Can't Read");
         return 3;
     }
 
@@ -271,7 +271,7 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
         dup2(pipefd[0],STDIN_FILENO); //to read
         close(pipefd[0]);
         close(pipefd[1]);
-        //execlp("grep","grep","rtt",NULL);
+
         execvp(cmds2[0],cmds2);
     }
 
@@ -279,7 +279,7 @@ int execvpSeqPipe(char *cmds[], char *cmds2[]){ //FUNCIONA PERFEITOO!!
     close(pipefd[0]);
     close(pipefd[1]);
 
-//posso fazer um for aqui!
+//Esperar os processos acabarem para juntar e encerrar!
     waitpid(pid1,NULL,0);
     waitpid(pid2,NULL,0);
     return 0;
@@ -297,7 +297,7 @@ int execvpSeqRed(char *cmds[],char *arq){
         exit(0);
     }
 
-    if(pid1==0){                 // USAR ESSE COMANDO\/
+    if(pid1==0){
         int fileRed = open(arq,O_RDWR | O_APPEND | O_CREAT, 0777); //abrir o arq, appenda-lo ou cria-lo! 0777 (permissoes) - like chmod (octal)
         if(fileRed==-1){
             printf("Error creating the file\n");
@@ -310,7 +310,6 @@ int execvpSeqRed(char *cmds[],char *arq){
         execvp(cmds[0],cmds);
     }
 
-//posso fazer um for aqui!
     waitpid(pid1,NULL,0);
     printf("Command's ""[%s]"" output saved in the end of the file: %s\n", cmds[0], arq);
 
@@ -1127,11 +1126,10 @@ int main(int argc, char* argv[]) {
 }
 
 //Verificar o !! (ainda com prob quando < 2)
-    //FAZER MAKEFILE!!
-//BACKGROUND &
+    //FAZER MAKEFILE!! (COM REFATORAÇAO)
+//BACKGROUND & (Pesquisar para ver se consigo fazer bem!!)
 
-
-// PRECISO COLOCAR UM CHECK DO STYLE ANTES DE CADA EXECUÃO!!
+//REFATORAR!! E lembrar do PDF!!
 
 /*Para execução perfeita do batch, é preciso que tenha o exit no final ou, pelo menos, uma linha vazia no final (\n)
     assim, não foi verificado nenhum erro. na execução do batch file.*/
