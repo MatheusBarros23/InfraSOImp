@@ -1199,6 +1199,7 @@ int main(int argc, char* argv[]) {
         }
         if(argc>=3 && strstr(argv[1],"<")==NULL){
             fprintf(stderr,"Too many arguments! Choose the correct file\n");
+
             exit(0);
         }
     }
