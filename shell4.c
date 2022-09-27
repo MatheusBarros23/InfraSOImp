@@ -791,7 +791,7 @@ int main(int argc, char* argv[]) {
                             char *txt;
                             txt = strtok(cmdsArrayRedOut[0], " ");
                             int k = 0;
-                            while (txt != NULL) {
+                            while (txt != NULL) {\
                                 argv_RedOut[k] = txt;
                                 txt = strtok(NULL, " ");
                                 k++;
@@ -881,10 +881,6 @@ int main(int argc, char* argv[]) {
                     argvPar.cmds[l] = cmdsArray[l]; //problema aqui é que estou passando todos os comandos!! peciso fazer com que cada comando seja passado para sua thread!!
                 }
 
-                //for para analisar o struct criado!!
-                /*for (int l = 0; l < cmd_count; ++l) {
-                   printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
-                } */
 
                 for (int i = 0; i < cmd_count; ++i) {
                     // printf("cmd_count: %d\n",cmd_count);
@@ -1204,6 +1200,7 @@ int main(int argc, char* argv[]) {
     }
     return 0;
 }
+
 
 //Verificar o !! (ainda com prob quando < 2)
     //FAZER MAKEFILE!! (COM REFATORAÇAO)
