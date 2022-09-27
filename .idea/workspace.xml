@@ -9,9 +9,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)">
+    <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)&#10;&#10;----&#10;CORRECT MERGE!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/a.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/InfraSOImp/shell3.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell3.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -94,7 +94,8 @@
       <workItem from="1663958281338" duration="11495000" />
       <workItem from="1664022595221" duration="23734000" />
       <workItem from="1664140108475" duration="147000" />
-      <workItem from="1664235299675" duration="2027000" />
+      <workItem from="1664235299675" duration="5156000" />
+      <workItem from="1664313920696" duration="372000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -285,7 +286,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664235363000</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)&#10;&#10;----&#10;CORRECT MERGE!">
+      <created>1664237372114</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1664237372114</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -302,7 +310,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="TestFinal" />
+                        <option value="origin/NewDEV" />
                       </list>
                     </value>
                   </entry>
@@ -335,7 +343,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add fork" />
     <MESSAGE value="correct !! (+1) e encapsular o sequencial e Parallelo" />
     <MESSAGE value="correct !! (+1)" />
     <MESSAGE value="correct !! (+1) and space input" />
@@ -360,6 +367,7 @@
     <MESSAGE value="Missing: Backgroung&#10;&#10;Parcial: History (&gt;1)" />
     <MESSAGE value="Add Makefile for Shell3.c (prelude for refactoring)&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)" />
     <MESSAGE value="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)" />
+    <MESSAGE value="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)&#10;&#10;----&#10;CORRECT MERGE!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)&#10;&#10;----&#10;CORRECT MERGE!" />
   </component>
 </project>
