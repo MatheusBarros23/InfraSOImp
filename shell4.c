@@ -204,9 +204,6 @@ int *styleCheck(char *input){ //tbm cmd vazio!!
                 count++;
             }
         }
-        //if(count== strlen(input) && strcmp(input,"!!")&&execWorked==0){
-        //   fprintf(stderr,"No commands\n");
-        // }
     }
 }
 
