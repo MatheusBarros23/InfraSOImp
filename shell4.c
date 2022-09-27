@@ -678,23 +678,11 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            // printf("LETRA: [%d]",cmd[0]);
-
             //verificar mudança de estilo!
             styleCheck(cmd);
 
             //Splittar os Comandos pela ;
             char **cmdsArray = splitString(cmd, &cmd_count);
-
-            /*  for (int i = 0; i <= cmd_total; ++i) {
-                   printf("CMDSARRAY: %s\n",cmdsArray[i]);
-                   if(strstr(cmdsArray[i],"<")!=NULL){
-                       printf("TEM REDINP \n");
-                   }else{
-                       printf("TEM PIPE\n");
-                   }
-              }
-            */
 
 //Executar os comandos!!
             //printf("CMDTOTAL: %d\n",cmd_total);
@@ -789,9 +777,6 @@ int main(int argc, char* argv[]) {
                             argvRedInpExec.cmds[1] = argv_RedInp2[0];
                             argvRedInpExec.cmds[2] = NULL;
 
-                        //    printf("argvRedInpExec.cmds[0]: %s\n",argvRedInpExec.cmds[0]);
-                        //    printf("argvRedInpExec.cmds[1]: %s\n",argvRedInpExec.cmds[1]);
-                        //    printf("argvRedInpExec.cmds[2]: %s\n",argvRedInpExec.cmds[2]);
 
                             //So falta executar o processo com o arq de input!!
                             execvpSeq(argvRedInpExec.cmds);
@@ -841,10 +826,6 @@ int main(int argc, char* argv[]) {
                             argvRedOutExec.cmds[0] = argv_RedOut[0];
                             argvRedOutExec.cmds[1] = argv_RedOut[1];
                             argvRedOutExec.cmds[2] = argv_RedOut2[1];
-
-                            // printf("argvRedOutExec.cmds[0]: %s\n",argvRedOutExec.cmds[0]);
-                            // printf("argvRedOutExec.cmds[1]: %s\n",argvRedOutExec.cmds[1]);
-                            // printf("argvRedOutExec.cmds[2]: %s\n",argvRedOutExec.cmds[2]);
 
                             execvpSeqRed(argvRedOutExec.cmds, argv_RedOut2[0]);
 
@@ -904,19 +885,9 @@ int main(int argc, char* argv[]) {
                 }
 
                 //for para analisar o struct criado!!
-                for (int l = 0; l < cmd_count; ++l) {
-                   // printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
-                }
-                //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
-
-
-                //char *cmdArgvPar = execvpParSep(&argvPar);
-            //    printf("cmdArgvPar: %s\n",argvPar.cmds[0]); //ver issooooooo!!
-
-                //trocar o for para um de processos! fork
-                //alterar o ponteiro para função, pois não precisa mais!!
-                //tentar chamar a execução passando os mesmos parametros, onde um proc pai chamará os filhos em loop!
-                //correção e chamar a execução, feita na função!
+                /*for (int l = 0; l < cmd_count; ++l) {
+                   printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
+                } */
 
                 for (int i = 0; i < cmd_count; ++i) {
                     // printf("cmd_count: %d\n",cmd_count);
@@ -946,7 +917,6 @@ int main(int argc, char* argv[]) {
             cmd_total=0;
             histVerify=0;
 
-            //printf("ultimo %s   \n",lastCmd[1]);
         }
         while (argc>1 && argc<=3 && strstr(argv[1]," < ")==NULL ){ //para nao entrar
             //peguei o tamanho!!
@@ -997,11 +967,9 @@ int main(int argc, char* argv[]) {
                 char **cmdsArray = malloc(*cmdString * sizeof(char *));
                 cmdsArray = splitString(cmdString, &cmd_count);
 
-                for (int i = 0; i <= cmd_total ; ++i) {
-                 //   printf("CMD: %s\n",cmdsArray[i]);
-                }
-
-                //Corrigir erro quando não consegue abrir o arq!
+                /*for (int i = 0; i <= cmd_total ; ++i) {
+                    printf("CMD: %s\n",cmdsArray[i]);
+                }*/
 
                 // executar quando sequencial:
                 if(strcmp(style, "seq") == 0 && strcmp(cmd,"!!") && strstr(cmdString, "style")==NULL) {
@@ -1059,9 +1027,9 @@ int main(int argc, char* argv[]) {
 
                             }else if(strstr(cmdsArray[i]," < ")!=NULL){
                                     char **cmdsArrayRedInp = splitStringRedInp(cmdsArray[i], &cmd_count_red);
-                                    for (int i = 0; i <= cmd_count; ++i) {
+                                    /*for (int i = 0; i <= cmd_count; ++i) {
                                         // printf("CMDSARRAYRedInp[0]: %s\n",cmdsArrayRedInp[i]);
-                                    }
+                                    }*/
 
                                     //separar os cmd do args
                                     char *txt;
@@ -1074,9 +1042,9 @@ int main(int argc, char* argv[]) {
                                     }
                                     argv_RedInp[k] = NULL;
 
-                                    for (int l = 0; l <= k; ++l) {
-                                    //    printf("argv_RedInp[l]: %s\n",argv_RedInp[l]);
-                                    }
+                                    /*for (int l = 0; l <= k; ++l) {
+                                       printf("argv_RedInp[l]: %s\n",argv_RedInp[l]);
+                                    }*/
 
                                     //corrigir espacamento do file de saida!
                                     char *txt2;
@@ -1095,18 +1063,14 @@ int main(int argc, char* argv[]) {
                                     argvRedInpExec.cmds[1] = argv_RedInp2[0];
                                     argvRedInpExec.cmds[2] = NULL;
 
-                                 //   printf("argvRedInpExec.cmds[0]: %s\n",argvRedInpExec.cmds[0]);
-                                 //   printf("argvRedInpExec.cmds[1]: %s\n",argvRedInpExec.cmds[1]);
-                                 //   printf("argvRedInpExec.cmds[2]: %s\n",argvRedInpExec.cmds[2]);
 
                                     //So falta executar o processo com o arq de input!!
                                     execvpSeq(argvRedInpExec.cmds);
                             }else if(strstr(cmdsArray[i]," >> ") != NULL){
                                 char **cmdsArrayRedOut = splitStringRedOut(cmdsArray[i], &cmd_count_redOut);
-                                for (int i = 0; i < cmd_count_redOut; ++i) {
+                                /*for (int i = 0; i < cmd_count_redOut; ++i) {
                                     //  printf("cmdsArrayRedOut[i]: %s\n",cmdsArrayRedOut[i]);
-                                    //splitar o cmd dos args!!
-                                }
+                                }*/
 
                                 //ainda fica com o > no arq!, preciso limpar isso + os espaços!!
 
@@ -1120,10 +1084,6 @@ int main(int argc, char* argv[]) {
                                     k++;
                                 }
                                 argv_RedOut[k] = NULL;
-
-                                for (int l = 0; l <= k; ++l) {
-                                    //  printf("argv_RedOut[l]: %s\n",argv_RedOut[l]);
-                                }
 
                                 //limpar o espaçamento + ">" que sobrou no 2 elemento do array!
                                 //fiz isso para manter o mesmo padrão que os demais, sei que poderia ser feito a separação aqui mesmo!
@@ -1147,10 +1107,6 @@ int main(int argc, char* argv[]) {
                                 argvRedOutExec.cmds[1] = argv_RedOut[1];
                                 argvRedOutExec.cmds[2] = argv_RedOut2[1];
 
-                                // printf("argvRedOutExec.cmds[0]: %s\n",argvRedOutExec.cmds[0]);
-                                // printf("argvRedOutExec.cmds[1]: %s\n",argvRedOutExec.cmds[1]);
-                                // printf("argvRedOutExec.cmds[2]: %s\n",argvRedOutExec.cmds[2]);
-
                                 execvpSeqRed(argvRedOutExec.cmds, argv_RedOut2[0]);
 
                             }
@@ -1172,9 +1128,8 @@ int main(int argc, char* argv[]) {
                                     k++;
                                 }
                                 argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
-                                // printf("argv_pipe[0]: %s\n",argv_pipe[0]);
-                                //para o pai
 
+                                //para o pai
                                 char *txt2;
                                 txt2 = strtok(cmdsArrayPipe[1], " ");
                                 k = 0;
@@ -1195,10 +1150,9 @@ int main(int argc, char* argv[]) {
                     cmd_total=0;
                     histVerify=0;
                 }
-                    //fim sequencial
                     //executar paralelo
                 else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
-                   // Refazer! Não usar o threads!!
+                   // Refazer! Não usar o threads!! - FEITO
 
                     //inicializando a struct para armazenar os dados! Conforme o tamanho
                     Argv_ParStruct argvPar = {cmd_total};
@@ -1208,13 +1162,11 @@ int main(int argc, char* argv[]) {
                     }
 
                     //for para analisar o struct criado!!
-                    for (int l = 0; l < cmd_count; ++l) {
+                    /*for (int l = 0; l < cmd_count; ++l) {
                         //     printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
-                    }
-                    //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
+                    }*/
 
-                    //execução dos COMANDOS!! (Max. 2);
-
+                    //execução dos COMANDOS!!
                     for (int i = 0; i < cmd_count; ++i) {
                         // printf("cmd_count: %d\n",cmd_count);
 
@@ -1243,9 +1195,9 @@ int main(int argc, char* argv[]) {
             }
             fclose(pnt);
             //FIM PARALLELO
+
             //condição de saida quando não consigo abrir aqr!
             should_run=3;
-            //print shell encerrado!!
             break;
         }
         if(argc>=3 && strstr(argv[1],"<")==NULL){

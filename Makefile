@@ -4,7 +4,9 @@
 	$(CC) = gcc
 
 shell:
-	$(CC) shell3.c -lpthread -o shell
+	$(CC) shell4.c -lpthread -o shell
 
 Clean:
-		rm *.o shell
+		rm shell
+
+#PERGUNTAR SE PRECISA EXCLUIR O RESTO!! OU SO O SHELL EM QUESTAO!
