@@ -771,9 +771,9 @@ int main(int argc, char* argv[]) {
                   //  printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
                 }
                 //printf("paralelo -  argvPar->size- %d\n", argvPar.size);
-                //execução dos COMANDOS!! (Max. 2);
+                //execução dos COMANDOS!!
                 pthread_t thread1[cmd_count];
-                int  t1[cmd_count];
+                int t1[cmd_count]; //para armazenar os valores das threads criadas
 
                 //char *cmdArgvPar = execvpParSep(&argvPar);
             //    printf("cmdArgvPar: %s\n",argvPar.cmds[0]); //ver issooooooo!!
@@ -781,7 +781,7 @@ int main(int argc, char* argv[]) {
                 //testando criacao das threads!!
                 for (int i = 0; i < cmd_count; ++i) {
                     // printf("cmd_count: %d\n",cmd_count);
-                    t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!;
+                    t1[i] = pthread_create(&thread1[i], NULL, (void *) execvpPar, (void *) &argvPar); //enviar para cada um uma especifica!!; //precisei colocar o (void *) execvpPar pq ela foi definida de forma diferente! e precisei do endereço do endereço da funcao
                     if(t1[i])
                     {
                         fprintf(stderr,"Error - pthread_create() return code: %d\n", t1[i]);
