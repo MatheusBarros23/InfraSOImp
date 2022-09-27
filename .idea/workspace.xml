@@ -11,8 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="87d552c3-eaa3-4415-afb7-0a0d063794e5" name="Changes" comment="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)&#10;&#10;----&#10;CORRECT MERGE!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InfraSOImp/shell3.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell3.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/inputfile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/inputfile.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InfraSOImp/shell4.c" beforeDir="false" afterPath="$PROJECT_DIR$/InfraSOImp/shell4.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +95,8 @@
       <workItem from="1664022595221" duration="23734000" />
       <workItem from="1664140108475" duration="147000" />
       <workItem from="1664235299675" duration="5156000" />
-      <workItem from="1664313920696" duration="372000" />
+      <workItem from="1664313920696" duration="1371000" />
+      <workItem from="1664315826571" duration="1657000" />
     </task>
     <task id="LOCAL-00001" summary="add fork">
       <created>1662683612315</created>
@@ -293,7 +294,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664237372114</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Add Makefile for Shell3.c (prelude for refactoring)&#10;Correcting bugs!&#10;------------&#10;Missing: Backgroung&#10;Parcial: History (&gt;1)&#10;&#10;----&#10;CORRECT MERGE!">
+      <created>1664314301242</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1664314301243</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
