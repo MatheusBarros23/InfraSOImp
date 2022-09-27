@@ -6,7 +6,7 @@
 shell:
 	$(CC) shell4.c -lpthread -o shell
 
-Clean:
+clean:
 		rm shell
 
 #PERGUNTAR SE PRECISA EXCLUIR O RESTO!! OU SO O SHELL EM QUESTAO!
