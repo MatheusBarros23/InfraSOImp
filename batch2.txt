@@ -1,4 +1,0 @@
-style parallel
-sort file2.txt >> datafile3
-echo 123
-exit

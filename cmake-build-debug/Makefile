@@ -56,10 +56,10 @@ RM = "C:\Program Files\JetBrains\CLion 2021.3.3\bin\cmake\win\bin\cmake.exe" -E 
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\mathe\Downloads\InfraSOImp-master\InfraSOImp-master
+CMAKE_SOURCE_DIR = C:\Users\mathe\Documents\InfraSOImp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\mathe\Downloads\InfraSOImp-master\InfraSOImp-master\cmake-build-debug
+CMAKE_BINARY_DIR = C:\Users\mathe\Documents\InfraSOImp\cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -86,9 +86,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mathe\Downloads\InfraSOImp-master\InfraSOImp-master\cmake-build-debug\CMakeFiles C:\Users\mathe\Downloads\InfraSOImp-master\InfraSOImp-master\cmake-build-debug\\CMakeFiles\progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mathe\Documents\InfraSOImp\cmake-build-debug\CMakeFiles C:\Users\mathe\Documents\InfraSOImp\cmake-build-debug\\CMakeFiles\progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mathe\Downloads\InfraSOImp-master\InfraSOImp-master\cmake-build-debug\CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mathe\Documents\InfraSOImp\cmake-build-debug\CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -128,29 +128,29 @@ INFRASO/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\INFRASO.dir\build.make CMakeFiles/INFRASO.dir/build
 .PHONY : INFRASO/fast
 
-shell.obj: shell.c.obj
-.PHONY : shell.obj
+shell3.obj: shell3.c.obj
+.PHONY : shell3.obj
 
 # target to build an object file
-shell.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\INFRASO.dir\build.make CMakeFiles/INFRASO.dir/shell.c.obj
-.PHONY : shell.c.obj
+shell3.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\INFRASO.dir\build.make CMakeFiles/INFRASO.dir/shell3.c.obj
+.PHONY : shell3.c.obj
 
-shell.i: shell.c.i
-.PHONY : shell.i
+shell3.i: shell3.c.i
+.PHONY : shell3.i
 
 # target to preprocess a source file
-shell.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\INFRASO.dir\build.make CMakeFiles/INFRASO.dir/shell.c.i
-.PHONY : shell.c.i
+shell3.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\INFRASO.dir\build.make CMakeFiles/INFRASO.dir/shell3.c.i
+.PHONY : shell3.c.i
 
-shell.s: shell.c.s
-.PHONY : shell.s
+shell3.s: shell3.c.s
+.PHONY : shell3.s
 
 # target to generate assembly for a file
-shell.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\INFRASO.dir\build.make CMakeFiles/INFRASO.dir/shell.c.s
-.PHONY : shell.c.s
+shell3.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\INFRASO.dir\build.make CMakeFiles/INFRASO.dir/shell3.c.s
+.PHONY : shell3.c.s
 
 # Help Target
 help:
@@ -161,9 +161,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... INFRASO
-	@echo ... shell.obj
-	@echo ... shell.i
-	@echo ... shell.s
+	@echo ... shell3.obj
+	@echo ... shell3.i
+	@echo ... shell3.s
 .PHONY : help
 
 

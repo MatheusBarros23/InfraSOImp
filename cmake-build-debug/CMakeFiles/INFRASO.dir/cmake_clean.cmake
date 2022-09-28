@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/INFRASO.dir/shell.c.obj"
-  "CMakeFiles/INFRASO.dir/shell.c.obj.d"
+  "CMakeFiles/INFRASO.dir/shell3.c.obj"
+  "CMakeFiles/INFRASO.dir/shell3.c.obj.d"
   "INFRASO.exe"
   "INFRASO.exe.manifest"
   "INFRASO.pdb"
