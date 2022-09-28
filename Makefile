@@ -6,7 +6,10 @@
 shell:
 	$(CC) shell4.c -lpthread -o shell
 
-Clean:
+functions.h:
+	$(CC) functions.c -o functions
+
+clean:
 		rm shell
 
 #PERGUNTAR SE PRECISA EXCLUIR O RESTO!! OU SO O SHELL EM QUESTAO!
