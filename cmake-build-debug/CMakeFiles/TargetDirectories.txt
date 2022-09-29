@@ -1,3 +1,0 @@
-C:/Users/mathe/Downloads/FDS-Projeto/InfraSO/InfraSOImp/cmake-build-debug/CMakeFiles/INFRASO.dir
-C:/Users/mathe/Downloads/FDS-Projeto/InfraSO/InfraSOImp/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/mathe/Downloads/FDS-Projeto/InfraSO/InfraSOImp/cmake-build-debug/CMakeFiles/rebuild_cache.dir

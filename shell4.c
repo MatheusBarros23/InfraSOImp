@@ -1,5 +1,3 @@
-/*To correct process! Change threads to pipes*/
-
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -8,7 +6,7 @@
 #include <ctype.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include <pthread.h>
+//#include <pthread.h> //Not used. Here, just for legacy
 #include <fcntl.h>
 
 
@@ -36,7 +34,7 @@ int cmd_args_count=0;
 char *cmd_clean[MAX_LINE];
 int execWorked=0;
 int batchCheck=0;
-char *lastCmd[MAX_LINE/2+1];
+char lastCmd[MAX_LINE/2+1]="";
 int histVerify=0;
 int exitCheck =0;
 int should_run = 1;        /* flag to help exit program*/
@@ -57,7 +55,7 @@ int retNoCmd;
 
 
 //lokar o contador para não dar prob quando passar as strings!!
-//pthread_mutex_t lock;
+//pthread_mutex_t lock; //Not needed anymore
 
 //PASSAR OS DADOS DO PARALELO POR ESTRUTURA!!!
 
@@ -139,8 +137,7 @@ char **splitStringRed(char *string, int *cmdCountRed) { //legal fazer isso só a
         }
           //printf("array[i]: %s %i\n",*array,i);
     }
-    //printf("array[0]: %s \n",array[0]);
-   // printf("array[1]: %s \n",array[1]);
+
     return array;
 }
 
@@ -159,8 +156,6 @@ char **splitStringRedInp(char *string, int *cmdCountRedInp) { //legal fazer isso
         }
           //printf("array[i]: %s %i\n",*array,i);
     }
-   // printf("array[0]: %s \n",array[0]);
-   // printf("array[1]: %s \n",array[1]);
     return array;
 }
 
@@ -297,6 +292,37 @@ int execvpSeqRed(char *cmds[],char *arq){
     }
 
     if(pid1==0){
+        int fileRed = open(arq,O_WRONLY | O_CREAT, 0777); //abrir o arq, escrever ou cria-lo! 0777 (permissoes) - like chmod (octal)
+        if(fileRed==-1){
+            printf("Error creating the file\n");
+        }
+
+        /*Alterar o 1(stdout) para o arq que iremos criar!*/
+        dup2(fileRed, STDOUT_FILENO); //duplica o fd do fileRed! e substitui a saida para o file!!
+        close(fileRed);
+
+        execvp(cmds[0],cmds);
+    }
+
+    waitpid(pid1,NULL,0);
+    printf("Command's ""[%s]"" output saved in the end of the file: %s\n", cmds[0], arq);
+
+    return 0;
+}
+
+int execvpSeqRedAppnd(char *cmds[],char *arq){
+
+    /* fork a child process */
+    int pid1 = fork();
+    if(pid1 < 0){ /* error occured */
+        fprintf(stderr, "Comando falhou! Fork failed!");
+        return 2;
+    }
+    if(strstr(cmds[0],"exi")!=NULL){
+        exit(0);
+    }
+
+    if(pid1==0){
         int fileRed = open(arq,O_RDWR | O_APPEND | O_CREAT, 0777); //abrir o arq, appenda-lo ou cria-lo! 0777 (permissoes) - like chmod (octal)
         if(fileRed==-1){
             printf("Error creating the file\n");
@@ -320,11 +346,6 @@ char execvpPar2(char *Argv_par){
     if(strstr(Argv_par,"|")!=NULL){
 
         char **cmdsArrayPipe = splitStringPipe(Argv_par, &cmd_count_pipe);
-
-        for (int i = 0; i <= cmd_count; ++i) {
-             // printf("CMDSARRAYPIPE[0]: %s\n",cmdsArrayPipe[i]);
-            //splitar o cmd dos args!!
-        }
 
         //para o child
         char *txt;
@@ -444,7 +465,7 @@ char execvpPar2(char *Argv_par){
         argvRedOutExec.cmds[1] = argv_RedOut[1];
         argvRedOutExec.cmds[2] = argv_RedOut2[1];
 
-        execvpSeqRed(argvRedOutExec.cmds, argv_RedOut2[0]);
+        execvpSeqRedAppnd(argvRedOutExec.cmds, argv_RedOut2[0]);
     }
     else{
         char *txt;
@@ -463,8 +484,10 @@ char execvpPar2(char *Argv_par){
 
 }
 /*Deprecated! Not using Threads anymore, only fork()! */
+    // Here, just to show how it was compared to now (execvpar2())
 
 /*char execvpPar(Argv_ParStruct *Argv_par){
+ //Duvida tirada com Erico, a necessidade do (void *) antes quando chamamos a thread é pelaa assinatura char * antes. Se fosse void * funcionava normal!
     if(strstr(Argv_par->cmds[execvpPar_count],"|")!=NULL){
 
         char **cmdsArrayPipe = splitStringPipe(Argv_par->cmds[execvpPar_count], &cmd_count_pipe);
@@ -664,14 +687,275 @@ int main(int argc, char* argv[]) {
             else if (strcmp(cmd, "!!") == 0){
                 if(strcmp(argv[0], "!!") != 0){
                     if(strcmp(style,"seq")==0){
-                        retorno = execvpSeq(argv);
+                        if(strstr (lastCmd,"|") != NULL){
+                            printf("last: %s\n", lastCmd);
+                            char **cmdsArrayPipe = splitStringPipe(lastCmd, &cmd_count_pipe);
+                            char *txt;
+                            txt = strtok(cmdsArrayPipe[0], " ");
+                            int k = 0;
+
+                            while (txt != NULL) {
+                                argv_pipe[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_pipe[k] = 0; //ultima para NULL, necessidade do execvp
+
+                            //para o pai
+                            char *txt2;
+                            txt2 = strtok(cmdsArrayPipe[1], " ");
+                            k = 0;
+
+                            while (txt2 != NULL) {
+                                argv_pipe2[k] = txt2;
+                                txt2 = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_pipe2[k] = 0; //ultima para NULL, necessidade do execvp
+
+                            //esta tudo aqui!!
+                            execvpSeqPipe(argv_pipe,argv_pipe2);
+                        }else if(strstr(lastCmd," < ")!=NULL){
+                            printf("last: %s\n", lastCmd);
+                            char **cmdsArrayRedInp = splitStringRedInp(lastCmd, &cmd_count_red);
+
+                            char *txt;
+                            txt = strtok(cmdsArrayRedInp[0], " ");
+                            int k = 0;
+                            while (txt != NULL) {
+                                argv_RedInp[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_RedInp[k] = NULL;
+
+                            char *txt2;
+                            txt2 = strtok(cmdsArrayRedInp[1], " ");
+                            k = 0;
+                            while (txt2 != NULL) {
+                                argv_RedInp2[k] = txt2;
+                                txt2 = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_RedInp2[k] = NULL;
+
+                            Argv_RedInpStruct argvRedInpExec = {3};
+
+                            argvRedInpExec.cmds[0] = argv_RedInp[0];
+                            argvRedInpExec.cmds[1] = argv_RedInp2[0];
+                            argvRedInpExec.cmds[2] = NULL;
+                            execvpSeq(argvRedInpExec.cmds);
+
+                        }
+                        else if(strstr(lastCmd," >> ")!=NULL){
+                            printf("last: %s\n", lastCmd);
+                            char **cmdsArrayRedOut = splitStringRedOut(lastCmd, &cmd_count_redOut);
+
+                            char *txt;
+                            txt = strtok(cmdsArrayRedOut[0], " ");
+                            int k = 0;
+                            while (txt != NULL) {
+                                argv_RedOut[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_RedOut[k] = NULL;
+
+                            char *txt2;
+                            txt2 = strtok(cmdsArrayRedOut[1], "> ");
+                            k = 0;
+                            while (txt2 != NULL) {
+                                argv_RedOut2[k] = txt2;
+                                txt2 = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_RedOut2[k] = NULL;
+
+                            Argv_RedOutStruct argvRedOutExec = {4};
+
+                            argvRedOutExec.cmds[0] = argv_RedOut[0];
+                            argvRedOutExec.cmds[1] = argv_RedOut[1];
+                            argvRedOutExec.cmds[2] = argv_RedOut2[1];
+
+                            execvpSeqRedAppnd(argvRedOutExec.cmds, argv_RedOut2[0]);
+
+                        }else if(strstr(lastCmd," > ")!=NULL){
+                            printf("last: %s\n", lastCmd);
+                            char **cmdsArrayRed = splitStringRed(lastCmd, &cmd_count_red);
+
+                            char *txt;
+                            txt = strtok(cmdsArrayRed[0], " ");
+                            int k = 0;
+                            while (txt != NULL) {
+                                argv_Red[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_Red[k] = NULL;
+
+                            char *txt2;
+                            txt2 = strtok(cmdsArrayRed[1], " ");
+                            k = 0;
+                            while (txt2 != NULL) {
+                                argv_Red2[k] = txt2;
+                                txt2 = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv_Red2[k] = NULL;
+
+                            execvpSeqRed(argv_Red,argv_Red2[0]);
+
+                        }else{
+                            printf("last: %s\n", lastCmd);
+                            char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
+                            txt = strtok(lastCmd, " ");
+                            int k = 0;
+                            while (txt != NULL) {
+                                argv[k] = txt;
+                                txt = strtok(NULL, " ");
+                                k++;
+                            }
+                            argv[k] = NULL; //ultima para NULL, necessidade do execvp
+                            retorno = execvpSeq(argv);
+                        }
                     }else if(strcmp(style,"par")==0){
-                        retorno = execvpSeq(argv); //arrumar isso!! para aceitar tbm argv no execvpPar
+                        retorno = execvpSeq(argv);
                     }
                     if(retorno>0){
                     }
-                }else{
-                    fprintf(stdout, "No commands\n");
+                }else if(strstr(argv[0], "!!") != NULL){
+                    if(strstr (lastCmd,"|") != NULL){
+                        printf("last: %s\n", lastCmd);
+                        char **cmdsArrayPipe = splitStringPipe(lastCmd, &cmd_count_pipe);
+                        char *txt;
+                        txt = strtok(cmdsArrayPipe[0], " ");
+                        int k = 0;
+
+                        while (txt != NULL) {
+                            argv_pipe[k] = txt;
+                            txt = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_pipe[k] = 0;
+
+                        //para o pai
+                        char *txt2;
+                        txt2 = strtok(cmdsArrayPipe[1], " ");
+                        k = 0;
+
+                        while (txt2 != NULL) {
+                            argv_pipe2[k] = txt2;
+                            txt2 = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_pipe2[k] = 0; //ultima para NULL, necessidade do execvp
+
+                        //esta tudo aqui!!
+                        execvpSeqPipe(argv_pipe,argv_pipe2);
+                    }else if(strstr(lastCmd," >> ")!=NULL){
+                        printf("last: %s\n", lastCmd);
+
+                        char **cmdsArrayRedOut = splitStringRedOut(lastCmd, &cmd_count_redOut);
+
+                        char *txt;
+                        txt = strtok(cmdsArrayRedOut[0], " ");
+                        int k = 0;
+                        while (txt != NULL) {
+                            argv_RedOut[k] = txt;
+                            txt = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_RedOut[k] = NULL;
+
+                        char *txt2;
+                        txt2 = strtok(cmdsArrayRedOut[1], "> ");
+                        k = 0;
+                        while (txt2 != NULL) {
+                            argv_RedOut2[k] = txt2;
+                            txt2 = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_RedOut2[k] = NULL;
+
+                        Argv_RedOutStruct argvRedOutExec = {4};
+
+                        argvRedOutExec.cmds[0] = argv_RedOut[0];
+                        argvRedOutExec.cmds[1] = argv_RedOut[1];
+                        argvRedOutExec.cmds[2] = argv_RedOut2[1];
+
+                        execvpSeqRedAppnd(argvRedOutExec.cmds, argv_RedOut2[0]);
+
+                    }else if(strstr(lastCmd," < ")!=NULL){
+                        printf("last: %s\n", lastCmd);
+                        char **cmdsArrayRedInp = splitStringRedInp(lastCmd, &cmd_count_red);
+
+                        char *txt;
+                        txt = strtok(cmdsArrayRedInp[0], " ");
+                        int k = 0;
+                        while (txt != NULL) {
+                            argv_RedInp[k] = txt;
+                            txt = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_RedInp[k] = NULL;
+
+                        char *txt2;
+                        txt2 = strtok(cmdsArrayRedInp[1], " ");
+                        k = 0;
+                        while (txt2 != NULL) {
+                            argv_RedInp2[k] = txt2;
+                            txt2 = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_RedInp2[k] = NULL;
+
+                        Argv_RedInpStruct argvRedInpExec = {3};
+
+                        argvRedInpExec.cmds[0] = argv_RedInp[0];
+                        argvRedInpExec.cmds[1] = argv_RedInp2[0];
+                        argvRedInpExec.cmds[2] = NULL;
+                        execvpSeq(argvRedInpExec.cmds);
+
+                    }else if(strstr(lastCmd," > ")!=NULL){
+                        printf("last: %s\n", lastCmd);
+                        char **cmdsArrayRed = splitStringRed(lastCmd, &cmd_count_red);
+
+                        char *txt;
+                        txt = strtok(cmdsArrayRed[0], " ");
+                        int k = 0;
+                        while (txt != NULL) {
+                            argv_Red[k] = txt;
+                            txt = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_Red[k] = NULL;
+
+                        char *txt2;
+                        txt2 = strtok(cmdsArrayRed[1], " ");
+                        k = 0;
+                        while (txt2 != NULL) {
+                            argv_Red2[k] = txt2;
+                            txt2 = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv_Red2[k] = NULL;
+
+                        execvpSeqRed(argv_Red,argv_Red2[0]);
+
+                    }else{
+                        printf("last: %s\n", lastCmd);
+
+                        char *txt;
+                        txt = strtok(lastCmd, " ");
+                        int k = 0;
+                        while (txt != NULL) {
+                            argv[k] = txt;
+                            txt = strtok(NULL, " ");
+                            k++;
+                        }
+                        argv[k] = NULL; //ultima para NULL, necessidade do execvp
+                        retorno = execvpSeq(argv);
+                    }
                 }
             }
 
@@ -687,8 +971,9 @@ int main(int argc, char* argv[]) {
                 for (int i = 0; i <= cmd_total; ++i) {
                     //para separar os args de cada cmd e depois executá-los! (SEQUENTIAL) - per space!!
                     for (int j = 0; j <= cmd_args_count; ++j) {
-                        //if para verificar se tem | - pipe!!
-                      //  printf("cmdsArray[i] %s\n",cmdsArray[i]);
+                        if (i+1>cmd_total){
+                            strcpy(lastCmd, cmdsArray[i]);   // calling strcpy function
+                        }
                         if(strstr(cmdsArray[i],"|")==NULL && strstr(cmdsArray[i]," > ")==NULL && strstr(cmdsArray[i]," < ")==NULL && strstr(cmdsArray[i]," >> ")==NULL){
                             char *txt;                  //splitar o cmd dos args que recebe!! //esta dando segmentation fault!!
                             txt = strtok(cmdsArray[i], " ");
@@ -703,7 +988,6 @@ int main(int argc, char* argv[]) {
                             //sequencial!!
                             //printf("last: %s\n",lastCmd);
                             if (strcmp(style, "seq") == 0 && strcmp(cmd, "style") && strstr(cmdsArray[i],"|")==NULL && strstr(cmdsArray[i]," > ")==NULL && strstr(cmdsArray[i]," < ")==NULL && strstr(cmdsArray[i]," >> ")==NULL) {
-                                lastCmd[0]=argv[0];
                                 //forkar para que o execvp nao encerre o processo atual:
                                 execvpSeq(argv);
                             }//fim Sequencial!!
@@ -774,16 +1058,11 @@ int main(int argc, char* argv[]) {
                             argvRedInpExec.cmds[1] = argv_RedInp2[0];
                             argvRedInpExec.cmds[2] = NULL;
 
-
                             //So falta executar o processo com o arq de input!!
                             execvpSeq(argvRedInpExec.cmds);
 
                         }else if(strstr(cmdsArray[i]," >> ")!=NULL){
                             char **cmdsArrayRedOut = splitStringRedOut(cmdsArray[i], &cmd_count_redOut);
-                            for (int i = 0; i < cmd_count_redOut; ++i) {
-                                 //  printf("cmdsArrayRedOut[i]: %s\n",cmdsArrayRedOut[i]);
-                                //splitar o cmd dos args!!
-                            }
 
                         //ainda fica com o > no arq!, preciso limpar isso + os espaços!!
 
@@ -824,7 +1103,7 @@ int main(int argc, char* argv[]) {
                             argvRedOutExec.cmds[1] = argv_RedOut[1];
                             argvRedOutExec.cmds[2] = argv_RedOut2[1];
 
-                            execvpSeqRed(argvRedOutExec.cmds, argv_RedOut2[0]);
+                            execvpSeqRedAppnd(argvRedOutExec.cmds, argv_RedOut2[0]);
 
                         }else{
 
@@ -888,9 +1167,6 @@ int main(int argc, char* argv[]) {
 
                 for (int i = 0; i < cmd_count; ++i) {
                     // printf("cmd_count: %d\n",cmd_count);
-
-                    //getpid() - return PID child process
-                    //getppid() - return PID parent process
                     int pid1 = fork();
 
                     if (pid1<0){
@@ -1039,10 +1315,6 @@ int main(int argc, char* argv[]) {
                                     }
                                     argv_RedInp[k] = NULL;
 
-                                    /*for (int l = 0; l <= k; ++l) {
-                                       printf("argv_RedInp[l]: %s\n",argv_RedInp[l]);
-                                    }*/
-
                                     //corrigir espacamento do file de saida!
                                     char *txt2;
                                     txt2 = strtok(cmdsArrayRedInp[1], " ");
@@ -1065,10 +1337,6 @@ int main(int argc, char* argv[]) {
                                     execvpSeq(argvRedInpExec.cmds);
                             }else if(strstr(cmdsArray[i]," >> ") != NULL){
                                 char **cmdsArrayRedOut = splitStringRedOut(cmdsArray[i], &cmd_count_redOut);
-                                /*for (int i = 0; i < cmd_count_redOut; ++i) {
-                                    //  printf("cmdsArrayRedOut[i]: %s\n",cmdsArrayRedOut[i]);
-                                }*/
-
                                 //ainda fica com o > no arq!, preciso limpar isso + os espaços!!
 
                                 //separar os cmd do args do 1 array!!
@@ -1104,7 +1372,7 @@ int main(int argc, char* argv[]) {
                                 argvRedOutExec.cmds[1] = argv_RedOut[1];
                                 argvRedOutExec.cmds[2] = argv_RedOut2[1];
 
-                                execvpSeqRed(argvRedOutExec.cmds, argv_RedOut2[0]);
+                                execvpSeqRedAppnd(argvRedOutExec.cmds, argv_RedOut2[0]);
 
                             }
                             else{
@@ -1150,7 +1418,6 @@ int main(int argc, char* argv[]) {
                     //executar paralelo
                 else if (strcmp(style, "par") == 0 && strcmp(cmd,"!!")) {
                    // Refazer! Não usar o threads!! - FEITO
-
                     //inicializando a struct para armazenar os dados! Conforme o tamanho
                     Argv_ParStruct argvPar = {cmd_total};
 
@@ -1158,15 +1425,8 @@ int main(int argc, char* argv[]) {
                         argvPar.cmds[l] = cmdsArray[l];
                     }
 
-                    //for para analisar o struct criado!!
-                    /*for (int l = 0; l < cmd_count; ++l) {
-                        //     printf("\tparalelo -  argvPar->cmds - %s\n", argvPar.cmds[l]);
-                    }*/
-
                     //execução dos COMANDOS!!
                     for (int i = 0; i < cmd_count; ++i) {
-                        // printf("cmd_count: %d\n",cmd_count);
-
                         int pid1 = fork();
 
                         if (pid1<0){
@@ -1176,7 +1436,6 @@ int main(int argc, char* argv[]) {
 
                         if(pid1 == 0)
                         {
-                            //  printf("process: %d\n",i);
                             execvpPar2(argvPar.cmds[i]);
                             exit(0);
                         }
@@ -1205,11 +1464,3 @@ int main(int argc, char* argv[]) {
     }
     return 0;
 }
-
-//Verificar o !! (ainda com prob quando < 2)
-    //FAZER MAKEFILE!! (COM REFATORAÇAO)
-
-//REFATORAR!! E lembrar do PDF!!
-
-/*Para execução perfeita do batch, é preciso que tenha o exit no final ou, pelo menos, uma linha vazia no final (\n)
-    assim, não foi verificado nenhum erro. na execução do batch file.*/

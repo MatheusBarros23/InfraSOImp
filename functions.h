@@ -1,4 +1,4 @@
-
+/*Not on Make, here just to verify whats was used!*/
 #define MAX_LINE 200 /* 80 chars per line, per command */
 
 typedef struct
@@ -34,4 +34,5 @@ int *styleCheck(char *input);
 int execvpSeq(char *cmds[]);
 int execvpSeqPipe(char *cmds[], char *cmds2[]);
 int execvpSeqRed(char *cmds[],char *arq);
+int execvpSeqRedAppnd(char *cmds[],char *arq);
 char execvpPar2(char *Argv_par);

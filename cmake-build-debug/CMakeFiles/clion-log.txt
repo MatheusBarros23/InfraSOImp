@@ -1,1 +1,0 @@
-CMakeLists.txt not found in C:\Users\mathe\Downloads\FDS-Projeto\InfraSO\shell\InfraSOImp Select CMakeLists.txt
