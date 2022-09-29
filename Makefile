@@ -4,7 +4,7 @@
 	$(CC) = gcc
 
 shell:
-	$(CC) shell4.c -o shell
+	$(CC) shell.c -o shell
 
 functions.h:
 	$(CC) functions.c -o functions

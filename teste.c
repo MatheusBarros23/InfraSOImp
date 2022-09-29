@@ -1,44 +1,37 @@
-#include <unistd.h>
-#include <stdlib.h>
+#include <stdio.h>
 
+#include <string.h>
 
-int main(int argc, char** argv)
-{
-    int des_p[2];
-    if(pipe(des_p) == -1) {
-        perror("Pipe failed");
-        exit(1);
+int main () {
+
+    FILE *arq;
+
+    char c, letra = '\n';
+
+    int vezes=0;
+    char line[256];
+
+    arq = fopen("batch.txt","r+");
+    //Lendo o arquivo 1 por 1
+    while(fread (&c, sizeof(char), 1, arq)) {
+        if(c == letra) {
+            vezes++;
+        }
     }
+    printf("\nLinhas: %d\n",vezes + 1);
+    fclose(arq);
 
-    if(fork() == 0)            //first fork
-    {
-        close(STDOUT_FILENO);  //closing stdout
-        dup(des_p[1]);         //replacing stdout with pipe write
-        close(des_p[0]);       //closing pipe read
-        close(des_p[1]);
+    arq = fopen("batch.txt","r+");
+    //Lendo o arquivo 1 por 1
 
-        const char* prog1[] = { "ls", "-l", 0};
-        execvp(prog1[0], prog1);
-        perror("execvp of ls failed");
-        exit(1);
+    for (int i = 0; i <= vezes; ++i) {
+        fgets(line, sizeof(line), arq);
+        printf("LINHA %s",line);
     }
+    fclose(arq);
 
-    if(fork() == 0)            //creating 2nd child
-    {
-        close(STDIN_FILENO);   //closing stdin
-        dup(des_p[0]);         //replacing stdin with pipe read
-        close(des_p[1]);       //closing pipe write
-        close(des_p[0]);
 
-        const char* prog2[] = { "wc", "-l", 0};
-        execvp(prog2[0], prog2);
-        perror("execvp of wc failed");
-        exit(1);
-    }
 
-    close(des_p[0]);
-    close(des_p[1]);
-    wait(0);
-    wait(0);
-    return 0;
+    //Lendo o arquivo 1 por 1
+
 }

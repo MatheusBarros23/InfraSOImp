@@ -11,4 +11,3 @@ style sequential
 echo 31245
 ./shell < inputfile.txt
 echo 123; ls
-exit
