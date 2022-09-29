@@ -1,44 +1,24 @@
-#include <unistd.h>
-#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-
-int main(int argc, char** argv)
+int main()
 {
-    int des_p[2];
-    if(pipe(des_p) == -1) {
-        perror("Pipe failed");
-        exit(1);
-    }
+    char Src[120]= "educative";
+    char Dest[120] = "";
+    printf("Before copying\n");
+    printf("Source string: %s \n", Src);
+    printf("Destination string: %s \n\n", Dest);
 
-    if(fork() == 0)            //first fork
-    {
-        close(STDOUT_FILENO);  //closing stdout
-        dup(des_p[1]);         //replacing stdout with pipe write
-        close(des_p[0]);       //closing pipe read
-        close(des_p[1]);
+    strcpy(Dest, Src);   // calling strcpy function
+    printf("After copying\n");
+    printf("Source string: %s \n", Src);
+    printf("Destination string: %s \n", Dest);
+    printf("---------------------------------\n");
+    Src[120]= "educasade";
 
-        const char* prog1[] = { "ls", "-l", 0};
-        execvp(prog1[0], prog1);
-        perror("execvp of ls failed");
-        exit(1);
-    }
+    printf("Before copying\n");
+    printf("Source string: %s \n", Src);
+    printf("Destination string: %s \n\n", Dest);
 
-    if(fork() == 0)            //creating 2nd child
-    {
-        close(STDIN_FILENO);   //closing stdin
-        dup(des_p[0]);         //replacing stdin with pipe read
-        close(des_p[1]);       //closing pipe write
-        close(des_p[0]);
-
-        const char* prog2[] = { "wc", "-l", 0};
-        execvp(prog2[0], prog2);
-        perror("execvp of wc failed");
-        exit(1);
-    }
-
-    close(des_p[0]);
-    close(des_p[1]);
-    wait(0);
-    wait(0);
     return 0;
 }
