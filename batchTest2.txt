@@ -1,0 +1,6 @@
+echo 123; echo 312; date; ps; ls
+date; ps; ls
+style sequential
+echo 123; ps; echo 321; echo 123; ps; echo 321
+style parallel
+ps; echo 321; ps; echo 321

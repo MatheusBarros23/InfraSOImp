@@ -946,7 +946,7 @@ int main(int argc, char* argv[]) {
             while (fscanf(pnt, "%[^\n] ", cmdString) != EOF ){
                 h++;
                 if(h+1>linhas+1){
-                 //   exit(0);
+                    exit(0);
                 }
 
                 cmdString[strlen(cmdString) -1] =0; //posso concatenar com exit! para resolver!
