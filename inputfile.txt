@@ -1,0 +1,4 @@
+echo uehqwiuehwqi
+ps
+echo 1
+exit

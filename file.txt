@@ -1,0 +1,4 @@
+criar o comando !! (history) que permite o/a
+prompt. Caso nenhum comando tenha sido executado, a mensagem No
+commands deve ser apresentada no prompt.
+dasdadasdsadsd
